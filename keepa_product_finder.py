@@ -170,7 +170,10 @@ chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
-driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
+# Set up the Service object with the path to ChromeDriver
+chrome_driver_path = os.environ.get("CHROMEDRIVER_PATH")
+service = Service(chrome_driver_path)
+
 
 # driver = webdriver.Chrome(
 #     executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options
@@ -274,9 +277,8 @@ def get_otp_from_email(server, email_address, email_password, subject_filter):
 for seller_id in retailer_ids_list:
     # Initialize the Chrome driver with the options
     # driver = webdriver.Chrome(options=chrome_options)
-    driver = webdriver.Chrome(
-        executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options
-    )
+    # Initialize the Chrome driver with the Service object and options
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     # Open Keepa
     driver.get("https://keepa.com/#!")
 
