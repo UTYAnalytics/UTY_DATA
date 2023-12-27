@@ -143,6 +143,9 @@ import unicodedata
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException
+import imaplib
+import email
+import re
 
 SUPABASE_URL = "https://sxoqzllwkjfluhskqlfl.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4b3F6bGx3a2pmbHVoc2txbGZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDIyODE1MTcsImV4cCI6MjAxNzg1NzUxN30.FInynnvuqN8JeonrHa9pTXuQXMp9tE4LO0g5gj0adYE"
@@ -152,8 +155,22 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 username = "utycorp@"
 password = "H@h@!1234"
 
+# Gmail App Password
+server = "imap.gmail.com"
+email_address = "uty.tra@thebargainvillage.com"
+email_password = "kwuh xdki tstu vyct"
+subject_filter = "Keepa.com Account Security Alert and One-Time Login Code"
+
 # Set up Chrome options
-chrome_options = Options()
+chrome_options = webdriver.ChromeOptions()
+chrome_options = webdriver.ChromeOptions()
+chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--no-sandbox")
+driver = webdriver.Chrome(
+    executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options
+)
 
 # Use raw string for the file path
 download_dir = r"C:\Users\tran\OneDrive\Documents\Amazon Scraping\Amazon Scraping\Keepa_Selenium\file_download\keepa_product_finder"
@@ -205,6 +222,40 @@ result = cursor.fetchall()
 # Extract retailer_ids from the result
 retailer_ids_list = [row[0] for row in result]
 
+
+def get_otp_from_email(server, email_address, email_password, subject_filter):
+    mail = imaplib.IMAP4_SSL(server)
+    mail.login(email_address, email_password)
+    mail.select("inbox")
+
+    status, data = mail.search(None, '(SUBJECT "{}")'.format(subject_filter))
+    mail_ids = data[0].split()
+
+    latest_email_id = mail_ids[-1]
+    status, data = mail.fetch(latest_email_id, "(RFC822)")
+
+    raw_email = data[0][1].decode("utf-8")
+    email_message = email.message_from_bytes(data[0][1])
+
+    otp_pattern = re.compile(r"\b\d{6}\b")
+
+    if email_message.is_multipart():
+        for part in email_message.walk():
+            content_type = part.get_content_type()
+            if "text/plain" in content_type or "text/html" in content_type:
+                email_content = part.get_payload(decode=True).decode()
+                match = otp_pattern.search(email_content)
+                if match:
+                    return match.group(0)
+    else:
+        email_content = email_message.get_payload(decode=True).decode()
+        match = otp_pattern.search(email_content)
+        if match:
+            return match.group(0)
+
+    return None
+
+
 for seller_id in retailer_ids_list:
     # Initialize the Chrome driver with the options
     driver = webdriver.Chrome(options=chrome_options)
@@ -228,6 +279,12 @@ for seller_id in retailer_ids_list:
         password_field = driver.find_element(By.ID, "password")
         password_field.send_keys(password)
         password_field.send_keys(Keys.RETURN)
+        time.sleep(10)
+
+        otp = get_otp_from_email(server, email_address, email_password, subject_filter)
+        otp_field = driver.find_element(By.ID, "otp")
+        otp_field.send_keys(otp)
+        otp_field.send_keys(Keys.RETURN)
         time.sleep(5)
     except Exception as e:
         print("Error during login:", e)

@@ -15,6 +15,9 @@ from supabase import create_client, Client
 from datetime import date
 import productrequest
 import chardet
+import imaplib
+import email
+import re
 
 
 SUPABASE_URL = "https://sxoqzllwkjfluhskqlfl.supabase.co"
@@ -29,6 +32,11 @@ keepa_api_key_product = productrequest.KeepaAPI(
     "4ghd75c7ivb6tuoifdl793k6kvurslo049b40gkvtqbdkgttq3t34btb7och58rb"
 )
 
+# Gmail App Password
+server = "imap.gmail.com"
+email_address = "uty.tra@thebargainvillage.com"
+email_password = "kwuh xdki tstu vyct"
+subject_filter = "Keepa.com Account Security Alert and One-Time Login Code"
 # Set up Chrome options
 chrome_options = Options()
 
@@ -52,6 +60,40 @@ driver.get("https://keepa.com/#!")
 
 wait = WebDriverWait(driver, 20)
 
+
+def get_otp_from_email(server, email_address, email_password, subject_filter):
+    mail = imaplib.IMAP4_SSL(server)
+    mail.login(email_address, email_password)
+    mail.select("inbox")
+
+    status, data = mail.search(None, '(SUBJECT "{}")'.format(subject_filter))
+    mail_ids = data[0].split()
+
+    latest_email_id = mail_ids[-1]
+    status, data = mail.fetch(latest_email_id, "(RFC822)")
+
+    raw_email = data[0][1].decode("utf-8")
+    email_message = email.message_from_bytes(data[0][1])
+
+    otp_pattern = re.compile(r"\b\d{6}\b")
+
+    if email_message.is_multipart():
+        for part in email_message.walk():
+            content_type = part.get_content_type()
+            if "text/plain" in content_type or "text/html" in content_type:
+                email_content = part.get_payload(decode=True).decode()
+                match = otp_pattern.search(email_content)
+                if match:
+                    return match.group(0)
+    else:
+        email_content = email_message.get_payload(decode=True).decode()
+        match = otp_pattern.search(email_content)
+        if match:
+            return match.group(0)
+
+    return None
+
+
 # Login process
 try:
     login_button = wait.until(
@@ -65,6 +107,12 @@ try:
     password_field = driver.find_element(By.ID, "password")
     password_field.send_keys(password)
     password_field.send_keys(Keys.RETURN)
+    time.sleep(10)
+
+    otp = get_otp_from_email(server, email_address, email_password, subject_filter)
+    otp_field = driver.find_element(By.ID, "otp")
+    otp_field.send_keys(otp)
+    otp_field.send_keys(Keys.RETURN)
     time.sleep(5)
 except Exception as e:
     print("Error during login:", e)
@@ -94,7 +142,7 @@ try:
         EC.element_to_be_clickable((By.XPATH, '//*[@id="tool-row-menu"]/ul/li[8]'))
     )
     allrow_button.click()
-    time.sleep(70)
+    time.sleep(30)
     # Download process
     download_button = wait.until(
         EC.element_to_be_clickable(
@@ -145,7 +193,7 @@ else:
 
 
 # Database connection parameters
-db_host = "cc"
+db_host = "db.sxoqzllwkjfluhskqlfl.supabase.co"
 db_name = "postgres"
 db_user = "postgres"
 db_password = "5giE*5Y5Uexi3P2"
