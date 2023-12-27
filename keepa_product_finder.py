@@ -124,6 +124,7 @@
 
 
 # # Remember to close the browser
+import tempfile
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -174,17 +175,28 @@ driver = webdriver.Chrome(
     executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options
 )
 
-# Use raw string for the file path
-download_dir = r"C:\Users\tran\OneDrive\Documents\Amazon Scraping\Amazon Scraping\Keepa_Selenium\file_download\keepa_product_finder"
+# # Use raw string for the file path
+# download_dir = r"C:\Users\tran\OneDrive\Documents\Amazon Scraping\Amazon Scraping\Keepa_Selenium\file_download\keepa_product_finder"
 
-# Add preferences to Chrome options
-prefs = {
-    "download.default_directory": download_dir,
-    "download.prompt_for_download": False,
-    "download.directory_upgrade": True,
-    "safebrowsing.enabled": True,
-}
-chrome_options.add_experimental_option("prefs", prefs)
+# # Add preferences to Chrome options
+# prefs = {
+#     "download.default_directory": download_dir,
+#     "download.prompt_for_download": False,
+#     "download.directory_upgrade": True,
+#     "safebrowsing.enabled": True,
+# }
+# chrome_options.add_experimental_option("prefs", prefs)
+
+# Create a temporary directory for downloads
+with tempfile.TemporaryDirectory() as download_dir:
+    chrome_options = Options()
+    prefs = {
+        "download.default_directory": download_dir,
+        "download.prompt_for_download": False,
+        "download.directory_upgrade": True,
+        "safebrowsing.enabled": True,
+    }
+    chrome_options.add_experimental_option("prefs", prefs)
 
 
 def wait_for_value_greater_than_zero(driver, locator):
@@ -344,7 +356,7 @@ for seller_id in retailer_ids_list:
             EC.element_to_be_clickable((By.XPATH, '//*[@id="filterSubmit"]'))
         )
         finder_button.click()
-        time.sleep(5)
+        time.sleep(2)
 
         showrow_button = wait.until(
             EC.element_to_be_clickable(
