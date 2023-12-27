@@ -152,6 +152,7 @@ from selenium.common.exceptions import TimeoutException
 import imaplib
 import email
 import re
+from pyvirtualdisplay import Display
 
 SUPABASE_URL = "https://sxoqzllwkjfluhskqlfl.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4b3F6bGx3a2pmbHVoc2txbGZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDIyODE1MTcsImV4cCI6MjAxNzg1NzUxN30.FInynnvuqN8JeonrHa9pTXuQXMp9tE4LO0g5gj0adYE"
@@ -167,21 +168,8 @@ email_address = "uty.tra@thebargainvillage.com"
 email_password = "kwuh xdki tstu vyct"
 subject_filter = "Keepa.com Account Security Alert and One-Time Login Code"
 
-# driver = webdriver.Chrome(
-#     executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options
-# )
-
-# # Use raw string for the file path
-# download_dir = r"C:\Users\tran\OneDrive\Documents\Amazon Scraping\Amazon Scraping\Keepa_Selenium\file_download\keepa_product_finder"
-
-# # Add preferences to Chrome options
-# prefs = {
-#     "download.default_directory": download_dir,
-#     "download.prompt_for_download": False,
-#     "download.directory_upgrade": True,
-#     "safebrowsing.enabled": True,
-# }
-# chrome_options.add_experimental_option("prefs", prefs)
+display = Display(visible=0, size=(800, 600))
+display.start()
 
 # Create a temporary directory for downloads
 with tempfile.TemporaryDirectory() as download_dir:
@@ -197,9 +185,6 @@ with tempfile.TemporaryDirectory() as download_dir:
     chrome_options.add_argument(f"user-agent={USER_AGENT}")
     # chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
     chrome_options.add_experimental_option("prefs", prefs)
-    # chrome_options.add_argument("--headless")
-    # chrome_options.add_argument("--disable-dev-shm-usage")
-    # chrome_options.add_argument("--no-sandbox")
 
 
 def wait_for_value_greater_than_zero(driver, locator):
@@ -275,6 +260,8 @@ def get_otp_from_email(server, email_address, email_password, subject_filter):
 
 for seller_id in retailer_ids_list:
     # Initialize the Chrome driver with the options
+    # Start virtual display
+
     driver = webdriver.Chrome(options=chrome_options)
     # Initialize the Chrome driver with the Service object and option
     # Open Keepa
@@ -397,6 +384,7 @@ for seller_id in retailer_ids_list:
             final_download_button.click()
             time.sleep(5)
             driver.quit()
+            display.stop()
 
         def get_newest_file(directory):
             files = glob.glob(os.path.join(directory, "*"))
@@ -710,4 +698,5 @@ for seller_id in retailer_ids_list:
 
     except Exception as e:
         driver.quit()
+        display.stop()
         continue

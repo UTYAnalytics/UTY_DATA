@@ -323,7 +323,8 @@ class KeepaAPI:
                     'Unknown status code "{}"'.format(self.response.status_code)
                 )
         return data
-    
+
+
 def add_columns_to_table(df: pd.DataFrame, api: KeepaAPI) -> pd.DataFrame:
     # Assuming df has a column 'Seller Id' from which we get seller IDs
     # seller_ids = df["Seller Id"].tolist()
@@ -347,6 +348,7 @@ def add_columns_to_table(df: pd.DataFrame, api: KeepaAPI) -> pd.DataFrame:
             df.at[index, "ratingCount"] = rating_count
 
     return df
+
 
 # a = KeepaAPI("4ghd75c7ivb6tuoifdl793k6kvurslo049b40gkvtqbdkgttq3t34btb7och58rb")
 # print(a.products(["0991167406"]).get("products")[0]["color"])
