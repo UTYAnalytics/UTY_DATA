@@ -168,12 +168,9 @@ prefs = {
 chrome_options.add_experimental_option("prefs", prefs)
 
 
-
 def wait_for_value_greater_than_zero(driver, locator):
     # Wait for the element to be present
-    element = WebDriverWait(driver, 20).until(
-        EC.presence_of_element_located(locator)
-    )
+    element = WebDriverWait(driver, 20).until(EC.presence_of_element_located(locator))
 
     # Continuously check the value until it's greater than 0
     while True:
@@ -188,11 +185,12 @@ def wait_for_value_greater_than_zero(driver, locator):
             EC.text_to_be_present_in_element(locator, str(current_value))
         )
 
+
 conn = psycopg2.connect(
-    dbname="postgres", # Usually, this is 'postgres'
-    user="postgres",   # Usually, this is 'postgres'
+    dbname="postgres",  # Usually, this is 'postgres'
+    user="postgres",  # Usually, this is 'postgres'
     password="5giE*5Y5Uexi3P2",
-    host="db.sxoqzllwkjfluhskqlfl.supabase.co"
+    host="db.sxoqzllwkjfluhskqlfl.supabase.co",
 )
 # Create a cursor
 cursor = conn.cursor()
@@ -215,14 +213,16 @@ for seller_id in retailer_ids_list:
     driver.get("https://keepa.com/#!")
 
     wait = WebDriverWait(driver, 20)
-# Login process
+    # Login process
     try:
         login_button = wait.until(
             EC.element_to_be_clickable((By.XPATH, '//*[@id="panelUserRegisterLogin"]'))
         )
         login_button.click()
 
-        username_field = wait.until(EC.visibility_of_element_located((By.ID, "username")))
+        username_field = wait.until(
+            EC.visibility_of_element_located((By.ID, "username"))
+        )
         username_field.send_keys(username)
 
         password_field = driver.find_element(By.ID, "password")
@@ -245,23 +245,39 @@ for seller_id in retailer_ids_list:
         product_finder_button.click()
         time.sleep(2)
 
-        salerankcurrentto_field = wait.until(EC.visibility_of_element_located((By.ID, "numberTo-SALES_current")))
-        salerankcurrentto_field.send_keys('500000')
+        salerankcurrentto_field = wait.until(
+            EC.visibility_of_element_located((By.ID, "numberTo-SALES_current"))
+        )
+        salerankcurrentto_field.send_keys("500000")
         time.sleep(2)
 
-        buyboxcurrentfrom_field = wait.until(EC.visibility_of_element_located((By.ID, "numberFrom-BUY_BOX_SHIPPING_current")))
-        buyboxcurrentfrom_field.send_keys('25')
+        buyboxcurrentfrom_field = wait.until(
+            EC.visibility_of_element_located(
+                (By.ID, "numberFrom-BUY_BOX_SHIPPING_current")
+            )
+        )
+        buyboxcurrentfrom_field.send_keys("25")
         time.sleep(2)
 
-        newoffercountcurrent_field = wait.until(EC.visibility_of_element_located((By.ID, "numberFrom-COUNT_NEW_current")))
-        newoffercountcurrent_field.send_keys('3')
+        newoffercountcurrent_field = wait.until(
+            EC.visibility_of_element_located((By.ID, "numberFrom-COUNT_NEW_current"))
+        )
+        newoffercountcurrent_field.send_keys("3")
         time.sleep(2)
 
-        sellerIDbuybox_field = wait.until(EC.visibility_of_element_located((By.ID, "dynamicAnyOfDetail-buyBoxSellerIdHistory")))
+        sellerIDbuybox_field = wait.until(
+            EC.visibility_of_element_located(
+                (By.ID, "dynamicAnyOfDetail-buyBoxSellerIdHistory")
+            )
+        )
         sellerIDbuybox_field.send_keys(seller_id)
 
-        reviewcountcurrent_field = wait.until(EC.visibility_of_element_located((By.ID, "numberFrom-COUNT_REVIEWS_current")))
-        reviewcountcurrent_field.send_keys('3')
+        reviewcountcurrent_field = wait.until(
+            EC.visibility_of_element_located(
+                (By.ID, "numberFrom-COUNT_REVIEWS_current")
+            )
+        )
+        reviewcountcurrent_field.send_keys("3")
 
         time.sleep(2)
 
@@ -271,34 +287,38 @@ for seller_id in retailer_ids_list:
         finder_button.click()
         time.sleep(5)
 
-        showrow_button=wait.until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="grid-tools-finder"]/div[1]/span[3]/span/span'))
+        showrow_button = wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, '//*[@id="grid-tools-finder"]/div[1]/span[3]/span/span')
+            )
         )
         showrow_button.click()
 
-        allrow_button=wait.until(
+        allrow_button = wait.until(
             EC.element_to_be_clickable((By.XPATH, '//*[@id="tool-row-menu"]/ul/li[7]'))
         )
         allrow_button.click()
-        time.sleep(10)
-        
+        time.sleep(5)
+
         # Logic to handle the presence of a specific popup
         try:
             # Wait for a certain amount of time for the popup to appear
             WebDriverWait(driver, 10).until(
-                EC.visibility_of_element_located((By.ID, 'popup3'))
+                EC.visibility_of_element_located((By.ID, "popup3"))
             )
             raise Exception("Popup detected, skipping to next retailer")
         except TimeoutException:
             # locator=(By.XPATH, '//*[@id="grid-tools-finder"]/div[2]')
             # wait_for_value_greater_than_zero(driver, locator)
             export_button = wait.until(
-                EC.element_to_be_clickable((By.XPATH, '//*[@id="grid-tools-finder"]/div[1]/span[4]/span'))
+                EC.element_to_be_clickable(
+                    (By.XPATH, '//*[@id="grid-tools-finder"]/div[1]/span[4]/span')
+                )
             )
             export_button.click()
-            time.sleep(10)
+            time.sleep(5)
             final_download_button = wait.until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="exportSubmit"]'))
+                EC.element_to_be_clickable((By.XPATH, '//*[@id="exportSubmit"]'))
             )
             final_download_button.click()
             time.sleep(5)
@@ -310,7 +330,6 @@ for seller_id in retailer_ids_list:
                 return None
             newest_file = max(files, key=os.path.getmtime)
             return newest_file
-
 
         file_path = download_dir
 
@@ -330,7 +349,9 @@ for seller_id in retailer_ids_list:
             header = header.replace(" ", "_")
             # Remove Vietnamese characters by decomposing and keeping only ASCII
             header = (
-                unicodedata.normalize("NFKD", header).encode("ASCII", "ignore").decode("ASCII")
+                unicodedata.normalize("NFKD", header)
+                .encode("ASCII", "ignore")
+                .decode("ASCII")
             )
             return header
 
@@ -457,22 +478,23 @@ for seller_id in retailer_ids_list:
             "One_Time_Coupon_Absolute",
             "One_Time_Coupon_Percentage",
             "Subscribe_and_Save_Coupon_Percentage",
-            "sys_run_date"
+            "sys_run_date",
         ]
+
         # Helper function to remove $ and convert to float
         def clean_currency(value):
-            if pd.isna(value) or value=='-':
+            if pd.isna(value) or value == "-":
                 return None
             if isinstance(value, str):
-                return float(value.replace('$', '').replace(',', '').strip())
+                return float(value.replace("$", "").replace(",", "").strip())
             return float(value)
 
         # Helper function to remove % and convert to percentage
         def clean_percentage(value):
-            if pd.isna(value) or value=='-':
+            if pd.isna(value) or value == "-":
                 return None
             if isinstance(value, str):
-                return float(value.replace('%', '').strip()) / 100
+                return float(value.replace("%", "").strip()) / 100
             return float(value)
 
         headers = [format_header(h) for h in headers]
@@ -482,58 +504,95 @@ for seller_id in retailer_ids_list:
 
         # List of columns to apply the cleaning functions
         currency_columns = [
-            'Buy_Box_Current_Price', 'Buy_Box_90_Days_Avg_Price', 
-            'Amazon_Current_Price', 'Amazon_90_Days_Avg_Price', 
-            'New_Current_Price', 'New_90_Days_Avg_Price', 
-            'New_3rd_Party_FBA_Current_Price', 'New_3rd_Party_FBA_90_Days_Avg_Price', 
-            'FBA_PickAndPack_Fee', 'Referral_Fee_Current_Price', 
-            'New_3rd_Party_FBM_Current_Price', 'New_3rd_Party_FBM_90_Days_Avg_Price', 
-            'New_Prime_Exclusive_Current_Price', 'New_Prime_Exclusive_90_Days_Avg_Price', 
-            'Lightning_Deals_Current_Price',
-            'Used_Current_Price', 'Used_90_Days_Avg_Price', 
-            'Used_Like_New_Current_Price', 'Used_Like_New_90_Days_Avg_Price', 
-            'Used_Very_Good_Current_Price', 'Used_Very_Good_90_Days_Avg_Price', 
-            'Used_Good_Current_Price', 'Used_Good_90_Days_Avg_Price', 
-            'Used_Acceptable_Current_Price', 'Used_Acceptable_90_Days_Avg_Price', 
-            'Warehouse_Deals_Current_Price', 'Warehouse_Deals_90_Days_Avg_Price', 
-            'List_Price_Current', 'List_Price_90_Days_Avg', 
-            'Rental_Current_Price', 'Rental_90_Days_Avg_Price', 
-            'One_Time_Coupon_Absolute'
+            "Buy_Box_Current_Price",
+            "Buy_Box_90_Days_Avg_Price",
+            "Amazon_Current_Price",
+            "Amazon_90_Days_Avg_Price",
+            "New_Current_Price",
+            "New_90_Days_Avg_Price",
+            "New_3rd_Party_FBA_Current_Price",
+            "New_3rd_Party_FBA_90_Days_Avg_Price",
+            "FBA_PickAndPack_Fee",
+            "Referral_Fee_Current_Price",
+            "New_3rd_Party_FBM_Current_Price",
+            "New_3rd_Party_FBM_90_Days_Avg_Price",
+            "New_Prime_Exclusive_Current_Price",
+            "New_Prime_Exclusive_90_Days_Avg_Price",
+            "Lightning_Deals_Current_Price",
+            "Used_Current_Price",
+            "Used_90_Days_Avg_Price",
+            "Used_Like_New_Current_Price",
+            "Used_Like_New_90_Days_Avg_Price",
+            "Used_Very_Good_Current_Price",
+            "Used_Very_Good_90_Days_Avg_Price",
+            "Used_Good_Current_Price",
+            "Used_Good_90_Days_Avg_Price",
+            "Used_Acceptable_Current_Price",
+            "Used_Acceptable_90_Days_Avg_Price",
+            "Warehouse_Deals_Current_Price",
+            "Warehouse_Deals_90_Days_Avg_Price",
+            "List_Price_Current",
+            "List_Price_90_Days_Avg",
+            "Rental_Current_Price",
+            "Rental_90_Days_Avg_Price",
+            "One_Time_Coupon_Absolute",
         ]
 
         percentage_columns = [
-            'Sales_Rank_90_Days_Drop_Percent', 'Buy_Box_90_Days_Drop_Percent', 'Buy_Box_90_Days_OOS_Percent','Reviews_Review_Count_90_Days_Drop_Percent',
-            'Amazon_90_Days_Drop_Percent', 'Amazon_90_Days_OOS_Percent','New_90_Days_Drop_Percent', 'New_90_Days_OOS_Percent',
-            'New_3rd_Party_FBA_90_Days_Drop_Percent', 'New_3rd_Party_FBM_90_Days_Drop_Percent', 
-            'New_Prime_Exclusive_90_Days_Drop_Percent', 'Used_90_Days_Drop_Percent', 
-            'Used_Like_New_90_Days_Drop_Percent', 'Used_Very_Good_90_Days_Drop_Percent', 'Used_90_Days_OOS_Percent',
-            'Used_Good_90_Days_Drop_Percent', 'Used_Acceptable_90_Days_Drop_Percent', 
-            'Warehouse_Deals_90_Days_Drop_Percent', 'List_Price_90_Days_Drop_Percent', 
-            'Rental_90_Days_Drop_Percent', 'Reviews_Review_Count_90_Days_Drop_Percent',
-            'Referral_Fee_Percent', 'One_Time_Coupon_Percentage','Subscribe_and_Save_Coupon_Percentage'
+            "Sales_Rank_90_Days_Drop_Percent",
+            "Buy_Box_90_Days_Drop_Percent",
+            "Buy_Box_90_Days_OOS_Percent",
+            "Reviews_Review_Count_90_Days_Drop_Percent",
+            "Amazon_90_Days_Drop_Percent",
+            "Amazon_90_Days_OOS_Percent",
+            "New_90_Days_Drop_Percent",
+            "New_90_Days_OOS_Percent",
+            "New_3rd_Party_FBA_90_Days_Drop_Percent",
+            "New_3rd_Party_FBM_90_Days_Drop_Percent",
+            "New_Prime_Exclusive_90_Days_Drop_Percent",
+            "Used_90_Days_Drop_Percent",
+            "Used_Like_New_90_Days_Drop_Percent",
+            "Used_Very_Good_90_Days_Drop_Percent",
+            "Used_90_Days_OOS_Percent",
+            "Used_Good_90_Days_Drop_Percent",
+            "Used_Acceptable_90_Days_Drop_Percent",
+            "Warehouse_Deals_90_Days_Drop_Percent",
+            "List_Price_90_Days_Drop_Percent",
+            "Rental_90_Days_Drop_Percent",
+            "Reviews_Review_Count_90_Days_Drop_Percent",
+            "Referral_Fee_Percent",
+            "One_Time_Coupon_Percentage",
+            "Subscribe_and_Save_Coupon_Percentage",
         ]
 
         integer_columns = [
-            'Sales_Rank_Current',
-            'Sales_Rank_90_Days_Avg',
-            'Sales_Rank_Drops_Last_90_Days',
-            'Bought_Past_Month',
-            'Reviews_Review_Count',
-            'Ratings_Format_Specific',
-            'Review_Count_Format_Specific',
-            'Buy_Box_Stock',
-            'New_Offer_Count_Current',
-            'New_Offer_Count_90_Days_Avg',
-            'Count_of_Retrieved_Live_Offers_New_FBA',
-            'Count_of_Retrieved_Live_Offers_New_FBM',
-            'Used_Offer_Count_Current',
-            'Used_Offer_Count_90_Days_Avg',
-            'Number_of_Items',
-            'Number_of_Pages',
-            'Package_Quantity',
-            'Item_Weight_g'
+            "Sales_Rank_Current",
+            "Sales_Rank_90_Days_Avg",
+            "Sales_Rank_Drops_Last_90_Days",
+            "Bought_Past_Month",
+            "Reviews_Review_Count",
+            "Ratings_Format_Specific",
+            "Review_Count_Format_Specific",
+            "Buy_Box_Stock",
+            "New_Offer_Count_Current",
+            "New_Offer_Count_90_Days_Avg",
+            "Count_of_Retrieved_Live_Offers_New_FBA",
+            "Count_of_Retrieved_Live_Offers_New_FBM",
+            "Used_Offer_Count_Current",
+            "Used_Offer_Count_90_Days_Avg",
+            "Number_of_Items",
+            "Number_of_Pages",
+            "Package_Dimension_cm3",
+            "Package_Weight_g",
+            "Package_Quantity",
+            "Item_Dimension_cm3",
+            "Item_Weight_g",
         ]
 
+        string_columns = [
+            "Product_Codes_EAN",
+            "Product_Codes_UPC",
+        ]
 
         # Apply cleaning functions to the specified columns
         for col in currency_columns:
@@ -543,7 +602,13 @@ for seller_id in retailer_ids_list:
             data[format_header(col)] = data[format_header(col)].apply(clean_percentage)
 
         for col in integer_columns:
-            data[format_header(col)] = data[format_header(col)].astype(float).fillna(0).astype(int)
+            data[format_header(col)] = (
+                data[format_header(col)].astype(float).fillna(0).astype(int)
+            )
+        # for col in string_columns:
+        #     data[format_header(col)] = (
+        #         data[format_header(col)].apply(lambda x: "{:.0f}".format(x))
+        #     )
 
         import numpy as np
 
@@ -556,283 +621,19 @@ for seller_id in retailer_ids_list:
                 # Example: row_dict['integer_column'] = int(row_dict['integer_column']) if row_dict['integer_column'] is not None else None
 
                 # Insert the row into the database
-                response = supabase.table("productfinder_keepa_raw").insert(row_dict).execute()
+                response = (
+                    supabase.table("productfinder_keepa_raw").insert(row_dict).execute()
+                )
 
                 if hasattr(response, "error") and response.error is not None:
                     raise Exception(f"Error inserting row: {response.error}")
 
                 print(f"Row inserted at index {index}")
-            
+
             except Exception as e:
                 print(f"Error with row at index {index}: {e}")
                 # Optionally, break or continue based on your preference
-        
+
     except Exception as e:
         driver.quit()
         continue
-    # finally:
-    #     # Ensure the browser is always closed at the end of each iteration
-    #     driver.quit()
-        
-    # def get_newest_file(directory):
-    #     files = glob.glob(os.path.join(directory, "*"))
-    #     if not files:  # Check if the files list is empty
-    #         return None
-    #     newest_file = max(files, key=os.path.getmtime)
-    #     return newest_file
-
-
-    # file_path = download_dir
-
-    # newest_file_path = get_newest_file(file_path)
-
-    # if newest_file_path:
-    #     data = pd.read_csv(newest_file_path)
-    #     data["sys_run_date"] = str(date.today())
-    #     # Proceed with the database insertion
-    # else:
-    #     print("No files found in the specified directory.")
-
-    # def format_header(header):
-    #     # Convert to lowercase
-    #     header = header.lower()
-    #     # Replace spaces with underscores
-    #     header = header.replace(" ", "_")
-    #     # Remove Vietnamese characters by decomposing and keeping only ASCII
-    #     header = (
-    #         unicodedata.normalize("NFKD", header).encode("ASCII", "ignore").decode("ASCII")
-    #     )
-    #     return header
-
-    # # Extract the header row
-    # headers = [
-    #     "Locale",
-    #     "Image_URLs",
-    #     "Title",
-    #     "Sales_Rank_Current",
-    #     "Sales_Rank_90_Days_Avg",
-    #     "Sales_Rank_90_Days_Drop_Percent",
-    #     "Sales_Rank_Drops_Last_90_Days",
-    #     "Sales_Rank_Reference",
-    #     "Sales_Rank_Subcategory_Sales_Ranks",
-    #     "Bought_Past_Month",
-    #     "Reviews_Rating",
-    #     "Reviews_Review_Count",
-    #     "Reviews_Review_Count_90_Days_Drop_Percent",
-    #     "Ratings_Format_Specific",
-    #     "Review_Count_Format_Specific",
-    #     "Last_Price_Change",
-    #     "Buy_Box_Current_Price",
-    #     "Buy_Box_90_Days_Avg_Price",
-    #     "Buy_Box_90_Days_Drop_Percent",
-    #     "Buy_Box_Stock",
-    #     "Buy_Box_90_Days_OOS_Percent",
-    #     "Buy_Box_Seller",
-    #     "Buy_Box_Is_FBA",
-    #     "Buy_Box_Unqualified",
-    #     "Amazon_Current_Price",
-    #     "Amazon_90_Days_Avg_Price",
-    #     "Amazon_90_Days_Drop_Percent",
-    #     "Amazon_90_Days_OOS_Percent",
-    #     "New_Current_Price",
-    #     "New_90_Days_Avg_Price",
-    #     "New_90_Days_Drop_Percent",
-    #     "New_90_Days_OOS_Percent",
-    #     "New_3rd_Party_FBA_Current_Price",
-    #     "New_3rd_Party_FBA_90_Days_Avg_Price",
-    #     "New_3rd_Party_FBA_90_Days_Drop_Percent",
-    #     "FBA_PickAndPack_Fee",
-    #     "Referral_Fee_Percent",
-    #     "Referral_Fee_Current_Price",
-    #     "New_3rd_Party_FBM_Current_Price",
-    #     "New_3rd_Party_FBM_90_Days_Avg_Price",
-    #     "New_3rd_Party_FBM_90_Days_Drop_Percent",
-    #     "New_Prime_Exclusive_Current_Price",
-    #     "New_Prime_Exclusive_90_Days_Avg_Price",
-    #     "New_Prime_Exclusive_90_Days_Drop_Percent",
-    #     "Lightning_Deals_Current_Price",
-    #     "Lightning_Deals_Upcoming_Deal_Price",
-    #     "Used_Current_Price",
-    #     "Used_90_Days_Avg_Price",
-    #     "Used_90_Days_Drop_Percent",
-    #     "Used_90_Days_OOS_Percent",
-    #     "Used_Like_New_Current_Price",
-    #     "Used_Like_New_90_Days_Avg_Price",
-    #     "Used_Like_New_90_Days_Drop_Percent",
-    #     "Used_Very_Good_Current_Price",
-    #     "Used_Very_Good_90_Days_Avg_Price",
-    #     "Used_Very_Good_90_Days_Drop_Percent",
-    #     "Used_Good_Current_Price",
-    #     "Used_Good_90_Days_Avg_Price",
-    #     "Used_Good_90_Days_Drop_Percent",
-    #     "Used_Acceptable_Current_Price",
-    #     "Used_Acceptable_90_Days_Avg_Price",
-    #     "Used_Acceptable_90_Days_Drop_Percent",
-    #     "Warehouse_Deals_Current_Price",
-    #     "Warehouse_Deals_90_Days_Avg_Price",
-    #     "Warehouse_Deals_90_Days_Drop_Percent",
-    #     "List_Price_Current",
-    #     "List_Price_90_Days_Avg",
-    #     "List_Price_90_Days_Drop_Percent",
-    #     "Rental_Current_Price",
-    #     "Rental_90_Days_Avg_Price",
-    #     "Rental_90_Days_Drop_Percent",
-    #     "New_Offer_Count_Current",
-    #     "New_Offer_Count_90_Days_Avg",
-    #     "Count_of_Retrieved_Live_Offers_New_FBA",
-    #     "Count_of_Retrieved_Live_Offers_New_FBM",
-    #     "Used_Offer_Count_Current",
-    #     "Used_Offer_Count_90_Days_Avg",
-    #     "Tracking_Since",
-    #     "Listed_Since",
-    #     "Categories_Root",
-    #     "Categories_Sub",
-    #     "Categories_Tree",
-    #     "Categories_Launchpad",
-    #     "ASIN",
-    #     "Product_Codes_EAN",
-    #     "Product_Codes_UPC",
-    #     "Product_Codes_PartNumber",
-    #     "Parent_ASIN",
-    #     "Variation_ASINs",
-    #     "Freq_Bought_Together",
-    #     "Type",
-    #     "Manufacturer",
-    #     "Brand",
-    #     "Product_Group",
-    #     "Model",
-    #     "Variation_Attributes",
-    #     "Color",
-    #     "Size",
-    #     "Edition",
-    #     "Format",
-    #     "Author",
-    #     "Contributors",
-    #     "Binding",
-    #     "Number_of_Items",
-    #     "Number_of_Pages",
-    #     "Publication_Date",
-    #     "Release_Date",
-    #     "Languages",
-    #     "Package_Dimension_cm3",
-    #     "Package_Weight_g",
-    #     "Package_Quantity",
-    #     "Item_Dimension_cm3",
-    #     "Item_Weight_g",
-    #     "Hazardous_Materials",
-    #     "Adult_Product",
-    #     "Trade_In_Eligible",
-    #     "Prime_Eligible",
-    #     "Subscribe_and_Save",
-    #     "One_Time_Coupon_Absolute",
-    #     "One_Time_Coupon_Percentage",
-    #     "Subscribe_and_Save_Coupon_Percentage",
-    #     "sys_run_date"
-    # ]
-    # # Helper function to remove $ and convert to float
-    # def clean_currency(value):
-    #     if pd.isna(value) or value=='-':
-    #         return None
-    #     if isinstance(value, str):
-    #         return float(value.replace('$', '').replace(',', '').strip())
-    #     return float(value)
-
-    # # Helper function to remove % and convert to percentage
-    # def clean_percentage(value):
-    #     if pd.isna(value) or value=='-':
-    #         return None
-    #     if isinstance(value, str):
-    #         return float(value.replace('%', '').strip()) / 100
-    #     return float(value)
-
-    # headers = [format_header(h) for h in headers]
-    # # data=data.to_dict(orient='records')
-    # # Convert column headers
-    # data.columns = headers
-
-    # # List of columns to apply the cleaning functions
-    # currency_columns = [
-    #     'Buy_Box_Current_Price', 'Buy_Box_90_Days_Avg_Price', 
-    #     'Amazon_Current_Price', 'Amazon_90_Days_Avg_Price', 
-    #     'New_Current_Price', 'New_90_Days_Avg_Price', 
-    #     'New_3rd_Party_FBA_Current_Price', 'New_3rd_Party_FBA_90_Days_Avg_Price', 
-    #     'FBA_PickAndPack_Fee', 'Referral_Fee_Current_Price', 
-    #     'New_3rd_Party_FBM_Current_Price', 'New_3rd_Party_FBM_90_Days_Avg_Price', 
-    #     'New_Prime_Exclusive_Current_Price', 'New_Prime_Exclusive_90_Days_Avg_Price', 
-    #     'Lightning_Deals_Current_Price',
-    #     'Used_Current_Price', 'Used_90_Days_Avg_Price', 
-    #     'Used_Like_New_Current_Price', 'Used_Like_New_90_Days_Avg_Price', 
-    #     'Used_Very_Good_Current_Price', 'Used_Very_Good_90_Days_Avg_Price', 
-    #     'Used_Good_Current_Price', 'Used_Good_90_Days_Avg_Price', 
-    #     'Used_Acceptable_Current_Price', 'Used_Acceptable_90_Days_Avg_Price', 
-    #     'Warehouse_Deals_Current_Price', 'Warehouse_Deals_90_Days_Avg_Price', 
-    #     'List_Price_Current', 'List_Price_90_Days_Avg', 
-    #     'Rental_Current_Price', 'Rental_90_Days_Avg_Price', 
-    #     'One_Time_Coupon_Absolute'
-    # ]
-
-    # percentage_columns = [
-    #     'Sales_Rank_90_Days_Drop_Percent', 'Buy_Box_90_Days_Drop_Percent', 'Buy_Box_90_Days_OOS_Percent','Reviews_Review_Count_90_Days_Drop_Percent',
-    #     'Amazon_90_Days_Drop_Percent', 'Amazon_90_Days_OOS_Percent','New_90_Days_Drop_Percent', 'New_90_Days_OOS_Percent',
-    #     'New_3rd_Party_FBA_90_Days_Drop_Percent', 'New_3rd_Party_FBM_90_Days_Drop_Percent', 
-    #     'New_Prime_Exclusive_90_Days_Drop_Percent', 'Used_90_Days_Drop_Percent', 
-    #     'Used_Like_New_90_Days_Drop_Percent', 'Used_Very_Good_90_Days_Drop_Percent', 'Used_90_Days_OOS_Percent',
-    #     'Used_Good_90_Days_Drop_Percent', 'Used_Acceptable_90_Days_Drop_Percent', 
-    #     'Warehouse_Deals_90_Days_Drop_Percent', 'List_Price_90_Days_Drop_Percent', 
-    #     'Rental_90_Days_Drop_Percent', 'Reviews_Review_Count_90_Days_Drop_Percent',
-    #     'Referral_Fee_Percent', 'One_Time_Coupon_Percentage','Subscribe_and_Save_Coupon_Percentage'
-    # ]
-
-    # integer_columns = [
-    #     'Sales_Rank_Current',
-    #     'Sales_Rank_90_Days_Avg',
-    #     'Sales_Rank_Drops_Last_90_Days',
-    #     'Bought_Past_Month',
-    #     'Reviews_Review_Count',
-    #     'Ratings_Format_Specific',
-    #     'Review_Count_Format_Specific',
-    #     'Buy_Box_Stock',
-    #     'New_Offer_Count_Current',
-    #     'New_Offer_Count_90_Days_Avg',
-    #     'Count_of_Retrieved_Live_Offers_New_FBA',
-    #     'Count_of_Retrieved_Live_Offers_New_FBM',
-    #     'Used_Offer_Count_Current',
-    #     'Used_Offer_Count_90_Days_Avg',
-    #     'Number_of_Items',
-    #     'Number_of_Pages',
-    #     'Package_Quantity',
-    #     'Item_Weight_g'
-    # ]
-
-
-    # # Apply cleaning functions to the specified columns
-    # for col in currency_columns:
-    #     data[format_header(col)] = data[format_header(col)].apply(clean_currency)
-
-    # for col in percentage_columns:
-    #     data[format_header(col)] = data[format_header(col)].apply(clean_percentage)
-
-    # for col in integer_columns:
-    #     data[format_header(col)] = data[format_header(col)].astype(float).fillna(0).astype(int)
-
-    # import numpy as np
-
-    # for index, row in data.iterrows():
-    #     try:
-    #         # Convert row to dictionary and handle NaN values
-    #         row_dict = row.replace({np.nan: None}).to_dict()
-
-    #         # Data cleaning and type conversion as necessary
-    #         # Example: row_dict['integer_column'] = int(row_dict['integer_column']) if row_dict['integer_column'] is not None else None
-
-    #         # Insert the row into the database
-    #         response = supabase.table("productfinder_keepa_raw").insert(row_dict).execute()
-
-    #         if hasattr(response, "error") and response.error is not None:
-    #             raise Exception(f"Error inserting row: {response.error}")
-
-    #         print(f"Row inserted at index {index}")
-        
-    #     except Exception as e:
-    #         print(f"Error with row at index {index}: {e}")
-    #         # Optionally, break or continue based on your preference
