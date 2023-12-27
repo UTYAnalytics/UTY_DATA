@@ -126,25 +126,27 @@
 # # Remember to close the browser
 import tempfile
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
 from selenium.webdriver.chrome.options import Options
 import os
 import time
 import pandas as pd
 import psycopg2
 import glob
-import csv
+
+# import csv
 from supabase import create_client, Client
 from datetime import date
 import re
 import unicodedata
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.action_chains import ActionChains
+
+# from selenium.webdriver.support.ui import Select
+# from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException
 import imaplib
 import email
@@ -164,14 +166,6 @@ email_address = "uty.tra@thebargainvillage.com"
 email_password = "kwuh xdki tstu vyct"
 subject_filter = "Keepa.com Account Security Alert and One-Time Login Code"
 
-# Set up Chrome options
-chrome_options = webdriver.ChromeOptions()
-chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--no-sandbox")
-
-
 # driver = webdriver.Chrome(
 #     executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options
 # )
@@ -190,14 +184,23 @@ chrome_options.add_argument("--no-sandbox")
 
 # Create a temporary directory for downloads
 with tempfile.TemporaryDirectory() as download_dir:
-    chrome_options = Options()
+    chrome_options = webdriver.ChromeOptions()
     prefs = {
         "download.default_directory": download_dir,
         "download.prompt_for_download": False,
         "download.directory_upgrade": True,
         "safebrowsing.enabled": True,
     }
+    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
     chrome_options.add_experimental_option("prefs", prefs)
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--no-sandbox")
+
+    # Initialize the Chrome driver with the Service object and options
+    driver = webdriver.Chrome(
+        executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options
+    )
 
 
 def wait_for_value_greater_than_zero(driver, locator):
@@ -274,10 +277,7 @@ def get_otp_from_email(server, email_address, email_password, subject_filter):
 for seller_id in retailer_ids_list:
     # Initialize the Chrome driver with the options
     # driver = webdriver.Chrome(options=chrome_options)
-    # Initialize the Chrome driver with the Service object and options
-    driver = webdriver.Chrome(
-        executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options
-    )
+    # Initialize the Chrome driver with the Service object and option
     # Open Keepa
     driver.get("https://keepa.com/#!")
 
