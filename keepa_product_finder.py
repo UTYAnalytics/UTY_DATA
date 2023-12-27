@@ -171,9 +171,9 @@ chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 
-driver = webdriver.Chrome(
-    executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options
-)
+# driver = webdriver.Chrome(
+#     executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options
+# )
 
 # # Use raw string for the file path
 # download_dir = r"C:\Users\tran\OneDrive\Documents\Amazon Scraping\Amazon Scraping\Keepa_Selenium\file_download\keepa_product_finder"
