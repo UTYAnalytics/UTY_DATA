@@ -20,6 +20,7 @@ import email
 import re
 import chromedriver_autoinstaller
 from selenium.common.exceptions import NoSuchElementException
+from datetime import datetime, timezone
 
 from pyvirtualdisplay import Display
 
@@ -280,7 +281,7 @@ for seller_id in retailer_ids_list:
 
         if newest_file_path:
             data = pd.read_csv(newest_file_path)
-            data["sys_run_date"] = str(date.today())
+            data["sys_run_date"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
             # Proceed with the database insertion
         else:
             print("No files found in the specified directory.")
