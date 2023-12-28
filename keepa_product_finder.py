@@ -1,158 +1,26 @@
-# CREATE TABLE IF NOT EXISTS productfinder_keepa_raw (
-#     Locale VARCHAR(5),
-#     Image_URLs TEXT,  -- Assuming multiple image URLs per product
-#     Title TEXT,
-#     Sales_Rank_Current INT,
-#     Sales_Rank_90_Days_Avg INT,
-#     Sales_Rank_90_Days_Drop_Percent FLOAT,
-#     Sales_Rank_Drops_Last_90_Days INT,
-#     Sales_Rank_Reference TEXT,
-#     Sales_Rank_Subcategory_Sales_Ranks TEXT,
-#     Bought_Past_Month INT,
-#     Reviews_Rating FLOAT,
-#     Reviews_Review_Count INT,
-#     Reviews_Review_Count_90_Days_Drop_Percent FLOAT,
-#     Ratings_Format_Specific INT,
-#     Review_Count_Format_Specific INT,
-#     Last_Price_Change TIMESTAMP,
-#     Buy_Box_Current_Price FLOAT,
-#     Buy_Box_90_Days_Avg_Price FLOAT,
-#     Buy_Box_90_Days_Drop_Percent FLOAT,
-#     Buy_Box_Stock INT,
-#     Buy_Box_90_Days_OOS_Percent FLOAT,
-#     Buy_Box_Seller TEXT,
-#     Buy_Box_Is_FBA BOOLEAN,
-#     Buy_Box_Unqualified BOOLEAN,
-#     Amazon_Current_Price FLOAT,
-#     Amazon_90_Days_Avg_Price FLOAT,
-#     Amazon_90_Days_Drop_Percent FLOAT,
-#     Amazon_90_Days_OOS_Percent FLOAT,
-#     New_Current_Price FLOAT,
-#     New_90_Days_Avg_Price FLOAT,
-#     New_90_Days_Drop_Percent FLOAT,
-#     New_90_Days_OOS_Percent FLOAT,
-#     New_3rd_Party_FBA_Current_Price FLOAT,
-#     New_3rd_Party_FBA_90_Days_Avg_Price FLOAT,
-#     New_3rd_Party_FBA_90_Days_Drop_Percent FLOAT,
-#     FBA_PickAndPack_Fee FLOAT,
-#     Referral_Fee_Percent FLOAT,
-#     Referral_Fee_Current_Price FLOAT,
-#     New_3rd_Party_FBM_Current_Price FLOAT,
-#     New_3rd_Party_FBM_90_Days_Avg_Price FLOAT,
-#     New_3rd_Party_FBM_90_Days_Drop_Percent FLOAT,
-#     New_Prime_Exclusive_Current_Price FLOAT,
-#     New_Prime_Exclusive_90_Days_Avg_Price FLOAT,
-#     New_Prime_Exclusive_90_Days_Drop_Percent FLOAT,
-#     Lightning_Deals_Current_Price FLOAT,
-#     Lightning_Deals_Upcoming_Deal_Price FLOAT,
-#     Used_Current_Price FLOAT,
-#     Used_90_Days_Avg_Price FLOAT,
-#     Used_90_Days_Drop_Percent FLOAT,
-#     Used_90_Days_OOS_Percent FLOAT,
-#     Used_Like_New_Current_Price FLOAT,
-#     Used_Like_New_90_Days_Avg_Price FLOAT,
-#     Used_Like_New_90_Days_Drop_Percent FLOAT,
-#     Used_Very_Good_Current_Price FLOAT,
-#     Used_Very_Good_90_Days_Avg_Price FLOAT,
-#     Used_Very_Good_90_Days_Drop_Percent FLOAT,
-#     Used_Good_Current_Price FLOAT,
-#     Used_Good_90_Days_Avg_Price FLOAT,
-#     Used_Good_90_Days_Drop_Percent FLOAT,
-#     Used_Acceptable_Current_Price FLOAT,
-#     Used_Acceptable_90_Days_Avg_Price FLOAT,
-#     Used_Acceptable_90_Days_Drop_Percent FLOAT,
-#     Warehouse_Deals_Current_Price FLOAT,
-#     Warehouse_Deals_90_Days_Avg_Price FLOAT,
-#     Warehouse_Deals_90_Days_Drop_Percent FLOAT,
-#     List_Price_Current FLOAT,
-#     List_Price_90_Days_Avg FLOAT,
-#     List_Price_90_Days_Drop_Percent FLOAT,
-#     Rental_Current_Price FLOAT,
-#     Rental_90_Days_Avg_Price FLOAT,
-#     Rental_90_Days_Drop_Percent FLOAT,
-#     New_Offer_Count_Current INT,
-#     New_Offer_Count_90_Days_Avg INT,
-#     Count_of_Retrieved_Live_Offers_New_FBA INT,
-#     Count_of_Retrieved_Live_Offers_New_FBM INT,
-#     Used_Offer_Count_Current INT,
-#     Used_Offer_Count_90_Days_Avg INT,
-#     Tracking_Since DATE,
-#     Listed_Since DATE,
-#     Categories_Root TEXT,
-#     Categories_Sub TEXT,
-#     Categories_Tree TEXT,
-#     Categories_Launchpad BOOLEAN,
-#     ASIN TEXT,
-#     Product_Codes_EAN TEXT,
-#     Product_Codes_UPC TEXT,
-#     Product_Codes_PartNumber TEXT,
-#     Parent_ASIN TEXT,
-#     Variation_ASINs TEXT,
-#     Freq_Bought_Together TEXT,
-#     Type TEXT,
-#     Manufacturer TEXT,
-#     Brand TEXT,
-#     Product_Group TEXT,
-#     Model TEXT,
-#     Variation_Attributes TEXT,
-#     Color TEXT,
-#     Size TEXT,
-#     Edition TEXT,
-#     Format TEXT,
-#     Author TEXT,
-#     Contributors TEXT,
-#     Binding TEXT,
-#     Number_of_Items INT,
-#     Number_of_Pages INT,
-#     Publication_Date DATE,
-#     Release_Date DATE,
-#     Languages TEXT[],
-#     Package_Dimension_cm3 TEXT,
-#     Package_Weight_g INT,
-#     Package_Quantity INT,
-#     Item_Dimension_cm3 TEXT,
-#     Item_Weight_g INT,
-#     Hazardous_Materials BOOLEAN,
-#     Adult_Product BOOLEAN,
-#     Trade_In_Eligible BOOLEAN,
-#     Prime_Eligible BOOLEAN,
-#     Subscribe_and_Save BOOLEAN,
-#     One_Time_Coupon_Absolute FLOAT,
-#     One_Time_Coupon_Percentage FLOAT,
-#     Subscribe_and_Save_Coupon_Percentage FLOAT
-# );
-
-
-# # Remember to close the browser
+# Remember to close the browser
 import tempfile
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
-from selenium.webdriver.chrome.options import Options
 import os
 import time
 import pandas as pd
 import psycopg2
 import glob
-
-# import csv
 from supabase import create_client, Client
 from datetime import date
 import re
 import unicodedata
-
-# from selenium.webdriver.support.ui import Select
-# from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException
 import imaplib
 import email
 import re
+import chromedriver_autoinstaller
 from pyvirtualdisplay import Display
+
 
 SUPABASE_URL = "https://sxoqzllwkjfluhskqlfl.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4b3F6bGx3a2pmbHVoc2txbGZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDIyODE1MTcsImV4cCI6MjAxNzg1NzUxN30.FInynnvuqN8JeonrHa9pTXuQXMp9tE4LO0g5gj0adYE"
@@ -168,23 +36,37 @@ email_address = "uty.tra@thebargainvillage.com"
 email_password = "kwuh xdki tstu vyct"
 subject_filter = "Keepa.com Account Security Alert and One-Time Login Code"
 
-display = Display(visible=0, size=(800, 600))
-display.start()
-
 # Create a temporary directory for downloads
 with tempfile.TemporaryDirectory() as download_dir:
+    display = Display(visible=0, size=(800, 800))
+    display.start()
+
+    chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
+    # and if it doesn't exist, download it automatically,
+    # then add chromedriver to path
     chrome_options = webdriver.ChromeOptions()
-    service = Service(executable_path="./chromedriver.exe")
     prefs = {
         "download.default_directory": download_dir,
         "download.prompt_for_download": False,
         "download.directory_upgrade": True,
         "safebrowsing.enabled": True,
     }
-    USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36"
-    chrome_options.add_argument(f"user-agent={USER_AGENT}")
-    # chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+    options = [
+        # Define window size here
+        "--window-size=1200,1200",
+        "--ignore-certificate-errors"
+        # "--headless",
+        # "--disable-gpu",
+        # "--window-size=1920,1200",
+        # "--ignore-certificate-errors",
+        # "--disable-extensions",
+        # "--no-sandbox",
+        # "--disable-dev-shm-usage",
+        #'--remote-debugging-port=9222'
+    ]
     chrome_options.add_experimental_option("prefs", prefs)
+    for option in options:
+        chrome_options.add_argument(option)
 
 
 def wait_for_value_greater_than_zero(driver, locator):
@@ -215,7 +97,7 @@ conn = psycopg2.connect(
 cursor = conn.cursor()
 
 # Execute the SQL query to retrieve distinct retailer_ids from the "storefront_retailer" table
-query = "SELECT distinct retailer_id FROM public.storefront_retailer"
+query = "SELECT distinct retailer_id FROM public.storefront_retailer union select distinct seller_id from public.best_seller_keepa"
 cursor.execute(query)
 
 # Fetch all the rows as a list
@@ -260,8 +142,6 @@ def get_otp_from_email(server, email_address, email_password, subject_filter):
 
 for seller_id in retailer_ids_list:
     # Initialize the Chrome driver with the options
-    # Start virtual display
-
     driver = webdriver.Chrome(options=chrome_options)
     # Initialize the Chrome driver with the Service object and option
     # Open Keepa
@@ -293,7 +173,7 @@ for seller_id in retailer_ids_list:
     except Exception as e:
         print("Error during login:", e)
 
-    # Navigate to the top seller list
+    # Navigate to the product_finder
     try:
         data_button = wait.until(
             EC.element_to_be_clickable((By.XPATH, '//*[@id="topMenu"]/li[4]/a/span'))
@@ -369,8 +249,6 @@ for seller_id in retailer_ids_list:
             )
             raise Exception("Popup detected, skipping to next retailer")
         except TimeoutException:
-            # locator=(By.XPATH, '//*[@id="grid-tools-finder"]/div[2]')
-            # wait_for_value_greater_than_zero(driver, locator)
             export_button = wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH, '//*[@id="grid-tools-finder"]/div[1]/span[4]/span')
@@ -384,7 +262,6 @@ for seller_id in retailer_ids_list:
             final_download_button.click()
             time.sleep(5)
             driver.quit()
-            display.stop()
 
         def get_newest_file(directory):
             files = glob.glob(os.path.join(directory, "*"))
@@ -678,10 +555,6 @@ for seller_id in retailer_ids_list:
             try:
                 # Convert row to dictionary and handle NaN values
                 row_dict = row.replace({np.nan: None}).to_dict()
-
-                # Data cleaning and type conversion as necessary
-                # Example: row_dict['integer_column'] = int(row_dict['integer_column']) if row_dict['integer_column'] is not None else None
-
                 # Insert the row into the database
                 response = (
                     supabase.table("productfinder_keepa_raw").insert(row_dict).execute()
@@ -698,5 +571,4 @@ for seller_id in retailer_ids_list:
 
     except Exception as e:
         driver.quit()
-        display.stop()
         continue
