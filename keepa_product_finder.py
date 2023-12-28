@@ -167,7 +167,9 @@ for seller_id in retailer_ids_list:
         password_field.send_keys(Keys.RETURN)
         time.sleep(10)
         try:
-            otp = get_otp_from_email(server, email_address, email_password, subject_filter)
+            otp = get_otp_from_email(
+                server, email_address, email_password, subject_filter
+            )
             otp_field = driver.find_element(By.ID, "otp")
             otp_field.send_keys(otp)
             otp_field.send_keys(Keys.RETURN)
@@ -191,13 +193,11 @@ for seller_id in retailer_ids_list:
             EC.element_to_be_clickable((By.XPATH, '//*[@id="subPanel"]/ul[3]/li[1]/a'))
         )
         product_finder_button.click()
-        time.sleep(2)
 
         salerankcurrentto_field = wait.until(
             EC.visibility_of_element_located((By.ID, "numberTo-SALES_current"))
         )
         salerankcurrentto_field.send_keys("500000")
-        time.sleep(2)
 
         buyboxcurrentfrom_field = wait.until(
             EC.visibility_of_element_located(
@@ -205,13 +205,11 @@ for seller_id in retailer_ids_list:
             )
         )
         buyboxcurrentfrom_field.send_keys("25")
-        time.sleep(2)
 
         newoffercountcurrent_field = wait.until(
             EC.visibility_of_element_located((By.ID, "numberFrom-COUNT_NEW_current"))
         )
         newoffercountcurrent_field.send_keys("3")
-        time.sleep(2)
 
         sellerIDbuybox_field = wait.until(
             EC.visibility_of_element_located(
@@ -227,27 +225,11 @@ for seller_id in retailer_ids_list:
         )
         reviewcountcurrent_field.send_keys("3")
 
-        time.sleep(2)
-
         finder_button = wait.until(
             EC.element_to_be_clickable((By.XPATH, '//*[@id="filterSubmit"]'))
         )
         finder_button.click()
         time.sleep(2)
-
-        showrow_button = wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//*[@id="grid-tools-finder"]/div[1]/span[3]/span/span')
-            )
-        )
-        showrow_button.click()
-
-        allrow_button = wait.until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="tool-row-menu"]/ul/li[7]'))
-        )
-        allrow_button.click()
-        time.sleep(5)
-
         # Logic to handle the presence of a specific popup
         try:
             # Wait for a certain amount of time for the popup to appear
@@ -256,6 +238,21 @@ for seller_id in retailer_ids_list:
             )
             raise Exception("Popup detected, skipping to next retailer")
         except TimeoutException:
+            showrow_button = wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, '//*[@id="grid-tools-finder"]/div[1]/span[3]/span/span')
+                )
+            )
+            showrow_button.click()
+
+            allrow_button = wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, '//*[@id="tool-row-menu"]/ul/li[7]')
+                )
+            )
+            allrow_button.click()
+            time.sleep(5)
+
             export_button = wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH, '//*[@id="grid-tools-finder"]/div[1]/span[4]/span')
@@ -581,5 +578,3 @@ for seller_id in retailer_ids_list:
         display.end()
         driver.quit()
         continue
-    finally:
-        driver.quit()
