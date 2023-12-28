@@ -19,6 +19,8 @@ import imaplib
 import email
 import re
 import chromedriver_autoinstaller
+from selenium.common.exceptions import NoSuchElementException
+
 from pyvirtualdisplay import Display
 
 
@@ -164,15 +166,19 @@ for seller_id in retailer_ids_list:
         password_field.send_keys(password)
         password_field.send_keys(Keys.RETURN)
         time.sleep(10)
-
-        otp = get_otp_from_email(server, email_address, email_password, subject_filter)
-        otp_field = driver.find_element(By.ID, "otp")
-        otp_field.send_keys(otp)
-        otp_field.send_keys(Keys.RETURN)
-        time.sleep(5)
-    except Exception as e:
-        raise e
-        print("Error during login:", e)
+        try:
+            otp = get_otp_from_email(server, email_address, email_password, subject_filter)
+            otp_field = driver.find_element(By.ID, "otp")
+            otp_field.send_keys(otp)
+            otp_field.send_keys(Keys.RETURN)
+            time.sleep(5)
+        except NoSuchElementException:
+            print("OTP field not found. Check the HTML or the timing.")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+    except:
+        raise Exception
+        # print("Error during login:", e)
 
     # Navigate to the product_finder
     try:
@@ -575,3 +581,5 @@ for seller_id in retailer_ids_list:
         display.end()
         driver.quit()
         continue
+    finally:
+        driver.quit()
