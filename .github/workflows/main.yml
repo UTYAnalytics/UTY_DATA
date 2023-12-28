@@ -20,7 +20,6 @@ jobs:
           pip install pandas
           pip install chromedriver-autoinstaller selenium pyvirtualdisplay
           pip install psycopg2
-          pip install glob
           pip install supabase
           pip install webdriver-manager
 
