@@ -265,7 +265,6 @@ for seller_id in retailer_ids_list:
             )
             final_download_button.click()
             time.sleep(5)
-            display.end()
             driver.quit()
 
         def get_newest_file(directory):
@@ -575,6 +574,5 @@ for seller_id in retailer_ids_list:
                 # Optionally, break or continue based on your preference
 
     except Exception as e:
-        display.end()
         driver.quit()
         continue
