@@ -100,8 +100,24 @@ conn = psycopg2.connect(
 cursor = conn.cursor()
 
 # Execute the SQL query to retrieve distinct retailer_ids from the "storefront_retailer" table
-query = "SELECT distinct retailer_id FROM public.storefront_retailer union select distinct seller_id from public.best_seller_keepa"
+query = """
+    SELECT distinct retailer_id
+    FROM storefront_retailer
+    WHERE retailer_id NOT IN (
+        SELECT 
+            CASE 
+                WHEN POSITION('(' IN buy_box_seller) > 0 AND POSITION(')' IN buy_box_seller) > 0 
+                THEN SUBSTRING(buy_box_seller FROM POSITION('(' IN buy_box_seller) + 1 FOR POSITION(')' IN buy_box_seller) - POSITION('(' IN buy_box_seller) - 1)
+                ELSE NULL
+            END AS extracted_string
+        FROM productfinder_keepa_raw
+        WHERE buy_box_seller LIKE '%(%' AND buy_box_seller LIKE '%)%'
+        AND sys_run_date IN ('2023-12-28', '2023-12-29')
+    )
+"""
+
 cursor.execute(query)
+
 
 # Fetch all the rows as a list
 result = cursor.fetchall()
