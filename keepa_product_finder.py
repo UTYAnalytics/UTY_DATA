@@ -99,11 +99,11 @@ conn = psycopg2.connect(
 # Create a cursor
 cursor = conn.cursor()
 
-# Execute the SQL query to retrieve distinct retailer_ids from the "storefront_retailer" table
+# Execute the SQL query to retrieve distinct seller_id from the "best_seller_keepa" table
 query = """
-    SELECT distinct retailer_id
-    FROM storefront_retailer
-    WHERE retailer_id NOT IN (
+    SELECT distinct seller_id
+    FROM best_seller_keepa
+    WHERE seller_id NOT IN (
         SELECT 
             CASE 
                 WHEN POSITION('(' IN buy_box_seller) > 0 AND POSITION(')' IN buy_box_seller) > 0 
