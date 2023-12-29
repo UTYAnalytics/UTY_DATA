@@ -44,6 +44,10 @@ display.start()
 
 chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
 
+display = Display(visible=0, size=(800, 800))
+display.start()
+
+chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
 # Create a temporary directory for downloads
 with tempfile.TemporaryDirectory() as download_dir:
     # and if it doesn't exist, download it automatically,
