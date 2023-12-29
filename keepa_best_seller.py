@@ -1,24 +1,27 @@
-# # Remember to close the browser
+import tempfile
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
 import os
 import time
 import pandas as pd
 import psycopg2
 import glob
-import csv
 from supabase import create_client, Client
 from datetime import date
-import productrequest
-import chardet
+import re
+import unicodedata
+from selenium.common.exceptions import TimeoutException
 import imaplib
 import email
 import re
-
+import chromedriver_autoinstaller
+from selenium.common.exceptions import NoSuchElementException
+from datetime import datetime, timezone
+import productrequest
+from pyvirtualdisplay import Display
 
 SUPABASE_URL = "https://sxoqzllwkjfluhskqlfl.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4b3F6bGx3a2pmbHVoc2txbGZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDIyODE1MTcsImV4cCI6MjAxNzg1NzUxN30.FInynnvuqN8JeonrHa9pTXuQXMp9tE4LO0g5gj0adYE"
@@ -37,29 +40,37 @@ server = "imap.gmail.com"
 email_address = "uty.tra@thebargainvillage.com"
 email_password = "kwuh xdki tstu vyct"
 subject_filter = "Keepa.com Account Security Alert and One-Time Login Code"
-# Set up Chrome options
-chrome_options = Options()
 
-# Use raw string for the file path
-download_dir = r"C:\Users\tran\OneDrive\Documents\Amazon Scraping\Amazon Scraping\Keepa_Selenium\file_download\keepa_best_seller"
+display = Display(visible=0, size=(800, 800))
+display.start()
 
-# Add preferences to Chrome options
-prefs = {
-    "download.default_directory": download_dir,
-    "download.prompt_for_download": False,
-    "download.directory_upgrade": True,
-    "safebrowsing.enabled": True,
-}
-chrome_options.add_experimental_option("prefs", prefs)
+chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
 
-# Initialize the Chrome driver with the options
-driver = webdriver.Chrome(options=chrome_options)
-
-# Open Keepa
-driver.get("https://keepa.com/#!")
-
-wait = WebDriverWait(driver, 20)
-
+# Create a temporary directory for downloads
+with tempfile.TemporaryDirectory() as download_dir:
+    chrome_options = webdriver.ChromeOptions()
+    prefs = {
+        "download.default_directory": download_dir,
+        "download.prompt_for_download": False,
+        "download.directory_upgrade": True,
+        "safebrowsing.enabled": True,
+    }
+    options = [
+        # Define window size here
+        "--window-size=1200,1200",
+        "--ignore-certificate-errors"
+        # "--headless",
+        # "--disable-gpu",
+        # "--window-size=1920,1200",
+        # "--ignore-certificate-errors",
+        # "--disable-extensions",
+        # "--no-sandbox",
+        # "--disable-dev-shm-usage",
+        #'--remote-debugging-port=9222'
+    ]
+    chrome_options.add_experimental_option("prefs", prefs)
+    for option in options:
+        chrome_options.add_argument(option)
 
 def get_otp_from_email(server, email_address, email_password, subject_filter):
     mail = imaplib.IMAP4_SSL(server)
@@ -96,26 +107,39 @@ def get_otp_from_email(server, email_address, email_password, subject_filter):
 
 # Login process
 try:
-    login_button = wait.until(
-        EC.element_to_be_clickable((By.XPATH, '//*[@id="panelUserRegisterLogin"]'))
-    )
-    login_button.click()
+    # Initialize the Chrome driver with the options
+    driver = webdriver.Chrome(options=chrome_options)
 
-    username_field = wait.until(EC.visibility_of_element_located((By.ID, "username")))
-    username_field.send_keys(username)
+    # Open Keepa
+    driver.get("https://keepa.com/#!")
 
-    password_field = driver.find_element(By.ID, "password")
-    password_field.send_keys(password)
-    password_field.send_keys(Keys.RETURN)
-    time.sleep(10)
+    wait = WebDriverWait(driver, 20)
+    #Login process
+    try:
+        login_button = wait.until(
+            EC.element_to_be_clickable((By.XPATH, '//*[@id="panelUserRegisterLogin"]'))
+        )
+        login_button.click()
 
-    otp = get_otp_from_email(server, email_address, email_password, subject_filter)
-    otp_field = driver.find_element(By.ID, "otp")
-    otp_field.send_keys(otp)
-    otp_field.send_keys(Keys.RETURN)
-    time.sleep(5)
-except Exception as e:
-    print("Error during login:", e)
+        username_field = wait.until(EC.visibility_of_element_located((By.ID, "username")))
+        username_field.send_keys(username)
+
+        password_field = driver.find_element(By.ID, "password")
+        password_field.send_keys(password)
+        password_field.send_keys(Keys.RETURN)
+        time.sleep(10)
+        try:
+            otp = get_otp_from_email(server, email_address, email_password, subject_filter)
+            otp_field = driver.find_element(By.ID, "otp")
+            otp_field.send_keys(otp)
+            otp_field.send_keys(Keys.RETURN)
+            time.sleep(5)
+        except NoSuchElementException:
+            print("OTP field not found. Check the HTML or the timing.")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+    except:
+        raise Exception
 
 # Navigate to the top seller list
 try:
@@ -181,12 +205,7 @@ file_path = download_dir
 newest_file_path = get_newest_file(file_path)
 
 if newest_file_path:
-    with open(newest_file_path, "rb") as f:
-        result = chardet.detect(
-            f.read()
-        )  # Reads a portion of the file to guess encoding
-        encoding = result["encoding"]
-    data = pd.read_csv(newest_file_path, encoding=encoding)
+    data = pd.read_csv(newest_file_path)
     # Proceed with the database insertion
 else:
     print("No files found in the specified directory.")

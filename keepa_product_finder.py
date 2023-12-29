@@ -19,6 +19,9 @@ import imaplib
 import email
 import re
 import chromedriver_autoinstaller
+from selenium.common.exceptions import NoSuchElementException
+from datetime import datetime, timezone
+
 from pyvirtualdisplay import Display
 
 
@@ -36,12 +39,13 @@ email_address = "uty.tra@thebargainvillage.com"
 email_password = "kwuh xdki tstu vyct"
 subject_filter = "Keepa.com Account Security Alert and One-Time Login Code"
 
+display = Display(visible=0, size=(800, 800))
+display.start()
+
+chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
+
 # Create a temporary directory for downloads
 with tempfile.TemporaryDirectory() as download_dir:
-    display = Display(visible=0, size=(800, 800))
-    display.start()
-
-    chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
     # and if it doesn't exist, download it automatically,
     # then add chromedriver to path
     chrome_options = webdriver.ChromeOptions()
@@ -59,7 +63,8 @@ with tempfile.TemporaryDirectory() as download_dir:
         # "--disable-gpu",
         # "--window-size=1920,1200",
         # "--ignore-certificate-errors",
-        # "--disable-extensions
+        # "--disable-extensions",
+        # "--no-sandbox",
         # "--disable-dev-shm-usage",
         #'--remote-debugging-port=9222'
     ]
@@ -95,9 +100,25 @@ conn = psycopg2.connect(
 # Create a cursor
 cursor = conn.cursor()
 
-# Execute the SQL query to retrieve distinct retailer_ids from the "storefront_retailer" table
-query = "SELECT distinct retailer_id FROM public.storefront_retailer union select distinct seller_id from public.best_seller_keepa"
+# Execute the SQL query to retrieve distinct seller_id from the "best_seller_keepa" table
+query = """
+    SELECT distinct seller_id
+    FROM best_seller_keepa
+    WHERE seller_id NOT IN (
+        SELECT 
+            CASE 
+                WHEN POSITION('(' IN buy_box_seller) > 0 AND POSITION(')' IN buy_box_seller) > 0 
+                THEN SUBSTRING(buy_box_seller FROM POSITION('(' IN buy_box_seller) + 1 FOR POSITION(')' IN buy_box_seller) - POSITION('(' IN buy_box_seller) - 1)
+                ELSE NULL
+            END AS extracted_string
+        FROM productfinder_keepa_raw
+        WHERE buy_box_seller LIKE '%(%' AND buy_box_seller LIKE '%)%'
+        AND sys_run_date IN ('2023-12-28', '2023-12-29')
+    )
+"""
+
 cursor.execute(query)
+
 
 # Fetch all the rows as a list
 result = cursor.fetchall()
@@ -142,7 +163,7 @@ def get_otp_from_email(server, email_address, email_password, subject_filter):
 for seller_id in retailer_ids_list:
     # Initialize the Chrome driver with the options
     driver = webdriver.Chrome(options=chrome_options)
-    # Initialize the Chrome driver with the Service object and option
+
     # Open Keepa
     driver.get("https://keepa.com/#!")
 
@@ -163,14 +184,21 @@ for seller_id in retailer_ids_list:
         password_field.send_keys(password)
         password_field.send_keys(Keys.RETURN)
         time.sleep(10)
-
-        otp = get_otp_from_email(server, email_address, email_password, subject_filter)
-        otp_field = driver.find_element(By.ID, "otp")
-        otp_field.send_keys(otp)
-        otp_field.send_keys(Keys.RETURN)
-        time.sleep(5)
-    except Exception as e:
-        print("Error during login:", e)
+        try:
+            otp = get_otp_from_email(
+                server, email_address, email_password, subject_filter
+            )
+            otp_field = driver.find_element(By.ID, "otp")
+            otp_field.send_keys(otp)
+            otp_field.send_keys(Keys.RETURN)
+            time.sleep(5)
+        except NoSuchElementException:
+            print("OTP field not found. Check the HTML or the timing.")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+    except:
+        raise Exception
+        # print("Error during login:", e)
 
     # Navigate to the product_finder
     try:
@@ -183,13 +211,11 @@ for seller_id in retailer_ids_list:
             EC.element_to_be_clickable((By.XPATH, '//*[@id="subPanel"]/ul[3]/li[1]/a'))
         )
         product_finder_button.click()
-        time.sleep(2)
 
         salerankcurrentto_field = wait.until(
             EC.visibility_of_element_located((By.ID, "numberTo-SALES_current"))
         )
         salerankcurrentto_field.send_keys("500000")
-        time.sleep(2)
 
         buyboxcurrentfrom_field = wait.until(
             EC.visibility_of_element_located(
@@ -197,13 +223,11 @@ for seller_id in retailer_ids_list:
             )
         )
         buyboxcurrentfrom_field.send_keys("25")
-        time.sleep(2)
 
         newoffercountcurrent_field = wait.until(
             EC.visibility_of_element_located((By.ID, "numberFrom-COUNT_NEW_current"))
         )
         newoffercountcurrent_field.send_keys("3")
-        time.sleep(2)
 
         sellerIDbuybox_field = wait.until(
             EC.visibility_of_element_located(
@@ -219,27 +243,11 @@ for seller_id in retailer_ids_list:
         )
         reviewcountcurrent_field.send_keys("3")
 
-        time.sleep(2)
-
         finder_button = wait.until(
             EC.element_to_be_clickable((By.XPATH, '//*[@id="filterSubmit"]'))
         )
         finder_button.click()
         time.sleep(2)
-
-        showrow_button = wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//*[@id="grid-tools-finder"]/div[1]/span[3]/span/span')
-            )
-        )
-        showrow_button.click()
-
-        allrow_button = wait.until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="tool-row-menu"]/ul/li[7]'))
-        )
-        allrow_button.click()
-        time.sleep(5)
-
         # Logic to handle the presence of a specific popup
         try:
             # Wait for a certain amount of time for the popup to appear
@@ -248,6 +256,21 @@ for seller_id in retailer_ids_list:
             )
             raise Exception("Popup detected, skipping to next retailer")
         except TimeoutException:
+            showrow_button = wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, '//*[@id="grid-tools-finder"]/div[1]/span[3]/span/span')
+                )
+            )
+            showrow_button.click()
+
+            allrow_button = wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, '//*[@id="tool-row-menu"]/ul/li[7]')
+                )
+            )
+            allrow_button.click()
+            time.sleep(5)
+
             export_button = wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH, '//*[@id="grid-tools-finder"]/div[1]/span[4]/span')
@@ -275,7 +298,7 @@ for seller_id in retailer_ids_list:
 
         if newest_file_path:
             data = pd.read_csv(newest_file_path)
-            data["sys_run_date"] = str(date.today())
+            data["sys_run_date"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
             # Proceed with the database insertion
         else:
             print("No files found in the specified directory.")
