@@ -72,6 +72,7 @@ with tempfile.TemporaryDirectory() as download_dir:
     for option in options:
         chrome_options.add_argument(option)
 
+
 def get_otp_from_email(server, email_address, email_password, subject_filter):
     mail = imaplib.IMAP4_SSL(server)
     mail.login(email_address, email_password)
@@ -114,32 +115,31 @@ try:
     driver.get("https://keepa.com/#!")
 
     wait = WebDriverWait(driver, 20)
-    #Login process
+    # Login process
+    login_button = wait.until(
+        EC.element_to_be_clickable((By.XPATH, '//*[@id="panelUserRegisterLogin"]'))
+    )
+    login_button.click()
+
+    username_field = wait.until(EC.visibility_of_element_located((By.ID, "username")))
+    username_field.send_keys(username)
+
+    password_field = driver.find_element(By.ID, "password")
+    password_field.send_keys(password)
+    password_field.send_keys(Keys.RETURN)
+    time.sleep(10)
     try:
-        login_button = wait.until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="panelUserRegisterLogin"]'))
-        )
-        login_button.click()
-
-        username_field = wait.until(EC.visibility_of_element_located((By.ID, "username")))
-        username_field.send_keys(username)
-
-        password_field = driver.find_element(By.ID, "password")
-        password_field.send_keys(password)
-        password_field.send_keys(Keys.RETURN)
-        time.sleep(10)
-        try:
-            otp = get_otp_from_email(server, email_address, email_password, subject_filter)
-            otp_field = driver.find_element(By.ID, "otp")
-            otp_field.send_keys(otp)
-            otp_field.send_keys(Keys.RETURN)
-            time.sleep(5)
-        except NoSuchElementException:
-            print("OTP field not found. Check the HTML or the timing.")
-        except Exception as e:
-            print(f"An unexpected error occurred: {e}")
-    except:
-        raise Exception
+        otp = get_otp_from_email(server, email_address, email_password, subject_filter)
+        otp_field = driver.find_element(By.ID, "otp")
+        otp_field.send_keys(otp)
+        otp_field.send_keys(Keys.RETURN)
+        time.sleep(5)
+    except NoSuchElementException:
+        print("OTP field not found. Check the HTML or the timing.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+except:
+    print(f"An unexpected error occurred: {e}")
 
 # Navigate to the top seller list
 try:
