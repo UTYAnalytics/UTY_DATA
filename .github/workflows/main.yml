@@ -29,5 +29,7 @@ jobs:
         run: sudo apt-get install xvfb
 
       - name: Running the Python script
+        run: python keepa_best_seller.py
+      - name: Running the Keepa script
         run: python keepa_product_finder.py
 
