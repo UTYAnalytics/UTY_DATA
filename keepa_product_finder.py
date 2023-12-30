@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import hashlib
 import os
 import time
 import pandas as pd
@@ -581,16 +582,20 @@ for seller_id in retailer_ids_list:
             try:
                 # Convert row to dictionary and handle NaN values
                 row_dict = row.replace({np.nan: None}).to_dict()
-                # Insert the row into the database
-                response = (
-                    supabase.table("productfinder_keepa_raw").insert(row_dict).execute()
-                )
 
-                if hasattr(response, "error") and response.error is not None:
-                    raise Exception(f"Error inserting row: {response.error}")
-
-                print(f"Row inserted at index {index}")
-
+                # Generate MD5 hash as the primary key
+                asin = row_dict.get("asin")
+                sys_run_date = row_dict.get("sys_run_date")
+                if asin and sys_run_date:
+                    md5_hash = hashlib.md5((asin + sys_run_date).encode()).hexdigest()
+                    row_dict["pk_column_name"] = md5_hash
+                    # Insert the row into the database
+                    response = (
+                        supabase.table("productfinder_keepa_raw").insert(row_dict).execute()
+                    )
+                    if hasattr(response, "error") and response.error is not None:
+                        raise Exception(f"Error inserting row: {response.error}")
+                    print(f"Row inserted at index {index}")
             except Exception as e:
                 print(f"Error with row at index {index}: {e}")
                 # Optionally, break or continue based on your preference
