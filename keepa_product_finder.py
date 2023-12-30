@@ -599,7 +599,31 @@ for seller_id in retailer_ids_list:
             except Exception as e:
                 print(f"Error with row at index {index}: {e}")
                 # Optionally, break or continue based on your preference
-
+            # Execute the SQL query to retrieve distinct seller_id from the "best_seller_keepa" table
+            query = """
+                SELECT distinct seller_id
+                FROM best_seller_keepa
+                WHERE seller_id NOT IN (
+                    SELECT 
+                        CASE 
+                            WHEN POSITION('(' IN buy_box_seller) > 0 AND POSITION(')' IN buy_box_seller) > 0 
+                            THEN SUBSTRING(buy_box_seller FROM POSITION('(' IN buy_box_seller) + 1 FOR POSITION(')' IN buy_box_seller) - POSITION('(' IN buy_box_seller) - 1)
+                            ELSE NULL
+                        END AS extracted_string
+                    FROM productfinder_keepa_raw
+                    WHERE buy_box_seller LIKE '%(%' AND buy_box_seller LIKE '%)%'
+                    AND sys_run_date IN ('2023-12-28', '2023-12-29')
+                )
+            """
+            
+            cursor.execute(query)
+            
+            
+            # Fetch all the rows as a list
+            result = cursor.fetchall()
+            
+            # Extract retailer_ids from the result
+            retailer_ids_list = [row[0] for row in result]
     except Exception as e:
         driver.quit()
         continue
