@@ -22,6 +22,8 @@ from selenium.common.exceptions import NoSuchElementException
 from datetime import datetime, timezone
 import productrequest
 from pyvirtualdisplay import Display
+from concurrent.futures import ThreadPoolExecutor
+import concurrent.futures
 
 SUPABASE_URL = "https://sxoqzllwkjfluhskqlfl.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4b3F6bGx3a2pmbHVoc2txbGZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDIyODE1MTcsImV4cCI6MjAxNzg1NzUxN30.FInynnvuqN8JeonrHa9pTXuQXMp9tE4LO0g5gj0adYE"
@@ -291,6 +293,11 @@ data.columns = headers
 for index, row in data.iterrows():
     insert_data = row.to_dict()
     response = supabase.table(table_name).insert(insert_data).execute()
+    with ThreadPoolExecutor() as executor:
+        # Submit each row for processing
+        futures = [executor.submit(response, insert_data)]
+        # Wait for all futures to complete
+        concurrent.futures.wait(futures)
     if hasattr(response, "error") and response.error is not None:
         raise Exception(f"Error inserting row: {response.error}")
     print(f"Row inserted at index {index}")
