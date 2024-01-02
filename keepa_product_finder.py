@@ -118,7 +118,6 @@ query = """
             END AS extracted_string
         FROM productfinder_keepa_raw
         WHERE buy_box_seller LIKE '%(%' AND buy_box_seller LIKE '%)%'
-        AND sys_run_date IN ('2023-12-28', '2023-12-29')
     )
 """
 
@@ -612,7 +611,6 @@ for seller_id in retailer_ids_list:
                         END AS extracted_string
                     FROM productfinder_keepa_raw
                     WHERE buy_box_seller LIKE '%(%' AND buy_box_seller LIKE '%)%'
-                    AND sys_run_date IN ('2023-12-28', '2023-12-29')
                 )
             """
             
