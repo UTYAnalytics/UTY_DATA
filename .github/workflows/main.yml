@@ -8,7 +8,7 @@ on:
 jobs:
   scrape1:
     runs-on: ubuntu-latest
-    timeout-minutes: 2000
+    timeout-minutes: 600000
     steps:
       - name: Checking out repo
         uses: actions/checkout@v3
@@ -33,7 +33,7 @@ jobs:
         run: python keepa_best_seller.py
   scrape2:
     runs-on: ubuntu-latest
-    timeout-minutes: 2000
+    timeout-minutes: 600000
     steps:
       - name: Checking out repo
         uses: actions/checkout@v3
