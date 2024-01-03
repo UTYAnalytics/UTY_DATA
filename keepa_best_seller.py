@@ -259,20 +259,28 @@ def best_seller_Data():
     cursor.execute(create_table_query)
     conn.commit()
 
-    # Insert data into the table
-    insert_query = """
-    SET statement_timeout = %s; -- Set the statement timeout
-    truncate table best_seller_keepa;
-    """  # replace ... with your column names and %s placeholders
-    # Set the timeout value (in seconds), for example, 300 seconds (5 minutes)
-    timeout_seconds = 600000
-    cursor.execute(insert_query, (timeout_seconds,))
-    conn.commit()
+    # # Insert data into the table
+    # insert_query = """
+    # truncate table best_seller_keepa;
+    # """  # replace ... with your column names and %s placeholders
+    # cursor.execute(insert_query)
+    # conn.commit()
 
-    # Close the connection
-    cursor.close()
-    conn.close()
+    # # Close the connection
+    # cursor.close()
+    # conn.close()
+    delete_response = (
+        supabase.table("best_seller_keepa")
+        .delete()
+        .neq("seller_id", None)
+        .execute()
+    )
 
+    # Check for an error in the delete response
+    if hasattr(delete_response, "error") and delete_response.error is not None:
+        print(f"Error deleting existing data: {delete_response.error}")
+        return
+    
     headers = [
         "name",
         "review_count_lifetime_percentage",
