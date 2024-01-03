@@ -31,8 +31,8 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Replace these with your Keepa username and password
-username = "2utycorp"
-password = "UTstrong@1!2"
+username = "utycorp@"
+password = "H@h@!1234"
 
 # Gmail App Password
 server = "imap.gmail.com"
@@ -40,15 +40,11 @@ email_address = "uty.tra@thebargainvillage.com"
 email_password = "kwuh xdki tstu vyct"
 subject_filter = "Keepa.com Account Security Alert and One-Time Login Code"
 
-display = Display(visible=0, size=(800, 800))
-display.start()
+# display = Display(visible=0, size=(800, 800))
+# display.start()
 
-chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
+# chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
 
-display = Display(visible=0, size=(800, 800))
-display.start()
-
-chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
 # Create a temporary directory for downloads
 with tempfile.TemporaryDirectory() as download_dir:
     # and if it doesn't exist, download it automatically,
