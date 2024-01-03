@@ -263,7 +263,9 @@ def best_seller_Data():
     insert_query = """
     truncate table best_seller_keepa;
     """  # replace ... with your column names and %s placeholders
-    cursor.execute(insert_query)
+    # Set the timeout value (in seconds), for example, 300 seconds (5 minutes)
+    timeout_seconds = 600
+    cursor.execute(insert_query, timeout=timeout_seconds)
     conn.commit()
 
     # Close the connection
