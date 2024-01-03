@@ -6,31 +6,31 @@ on:
     - cron: '0 8,17 * * *'  # Run every day at 8 AM and 5 PM
 
 jobs:
-  scrape1:
-    runs-on: ubuntu-latest
-    timeout-minutes: 600000
-    steps:
-      - name: Checking out repo
-        uses: actions/checkout@v3
+  # scrape1:
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 600000
+  #   steps:
+  #     - name: Checking out repo
+  #       uses: actions/checkout@v3
 
-      - name: Setting up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
+  #     - name: Setting up Python
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: "3.9"
 
-      - name: Installing dependencies
-        run: |
-          pip install pandas
-          pip install chromedriver-autoinstaller selenium pyvirtualdisplay
-          pip install psycopg2
-          pip install supabase
-          pip install webdriver-manager
+  #     - name: Installing dependencies
+  #       run: |
+  #         pip install pandas
+  #         pip install chromedriver-autoinstaller selenium pyvirtualdisplay
+  #         pip install psycopg2
+  #         pip install supabase
+  #         pip install webdriver-manager
 
-      - name: Install xvfb
-        run: sudo apt-get install xvfb
+  #     - name: Install xvfb
+  #       run: sudo apt-get install xvfb
 
-      - name: Running the Python script
-        run: python keepa_best_seller.py
+  #     - name: Running the Python script
+  #       run: python keepa_best_seller.py
   scrape2:
     runs-on: ubuntu-latest
     timeout-minutes: 600000
