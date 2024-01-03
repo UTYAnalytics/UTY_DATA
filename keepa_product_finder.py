@@ -31,8 +31,8 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Replace these with your Keepa username and password
-username = "utycorp@"
-password = "H@h@!1234"
+username = "2utycorp"
+password = "UTstrong@1!2"
 
 # Gmail App Password
 server = "imap.gmail.com"
@@ -302,7 +302,7 @@ for seller_id in retailer_ids_list:
 
         if newest_file_path:
             data = pd.read_csv(newest_file_path)
-            data["sys_run_date"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            data["sys_run_date"] = str(date.today())
             # Proceed with the database insertion
         else:
             print("No files found in the specified directory.")
