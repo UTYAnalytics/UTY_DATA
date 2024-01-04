@@ -452,7 +452,7 @@ for seller_id in retailer_ids_list:
         # Helper function to remove $ and convert to float
         def clean_currency(value):
             if pd.isna(value) or value == "-":
-                return None
+                return 0
             if isinstance(value, str):
                 return float(value.replace("$", "").replace(",", "").strip())
             return float(value)
@@ -460,7 +460,7 @@ for seller_id in retailer_ids_list:
         # Helper function to remove % and convert to percentage
         def clean_percentage(value):
             if pd.isna(value) or value == "-":
-                return None
+                return 0
             if isinstance(value, str):
                 return float(value.replace("%", "").strip()) / 100
             return float(value)
