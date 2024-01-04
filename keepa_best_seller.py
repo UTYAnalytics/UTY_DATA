@@ -310,6 +310,7 @@ def best_seller_Data():
             raise Exception(f"Error inserting row: {response.error}")
         print(f"Row inserted at index {index}")
     data_result.append(data)
+    return data_result
 
 with ThreadPoolExecutor() as executor:
         # Submit each row for processing
