@@ -22,7 +22,7 @@ import re
 import chromedriver_autoinstaller
 from selenium.common.exceptions import NoSuchElementException
 from datetime import datetime, timezone, timedelta
-
+import numpy as np
 from pyvirtualdisplay import Display
 
 
@@ -114,7 +114,7 @@ query = """
             END AS extracted_string
         FROM productfinder_keepa_raw
         WHERE buy_box_seller LIKE '%(%' AND buy_box_seller LIKE '%)%'
-    )
+    );
 """
 
 cursor.execute(query)
@@ -167,7 +167,7 @@ for seller_id in retailer_ids_list:
     # Open Keepa
     driver.get("https://keepa.com/#!")
 
-    wait = WebDriverWait(driver, 20)
+    wait = WebDriverWait(driver, 2000000)
     # Login process
     try:
         login_button = wait.until(
@@ -451,19 +451,25 @@ for seller_id in retailer_ids_list:
 
         # Helper function to remove $ and convert to float
         def clean_currency(value):
-            if pd.isna(value) or value == "-":
-                return 0
-            if isinstance(value, str):
-                return float(value.replace("$", "").replace(",", "").strip())
-            return float(value)
+            try:
+                if pd.isna(value) or value == "-":
+                    return 0
+                if isinstance(value, str):
+                    return float(value.replace("$", "").replace(",", "").strip())
+                return float(value)
+            except:
+                return 0.00
 
         # Helper function to remove % and convert to percentage
         def clean_percentage(value):
-            if pd.isna(value) or value == "-":
-                return 0
-            if isinstance(value, str):
-                return float(value.replace("%", "").strip()) / 100
-            return float(value)
+            try:
+                if pd.isna(value) or value == "-":
+                    return 0
+                if isinstance(value, str):
+                    return float(value.replace("%", "").strip()) / 100
+                return float(value)
+            except:
+                return 0.00
 
         headers = [format_header(h) for h in headers]
         # data=data.to_dict(orient='records')
@@ -577,9 +583,7 @@ for seller_id in retailer_ids_list:
         #     data[format_header(col)] = (
         #         data[format_header(col)].apply(lambda x: "{:.0f}".format(x))
         #     )
-
-        import numpy as np
-
+        
         for index, row in data.iterrows():
             try:
                 # Convert row to dictionary and handle NaN values
