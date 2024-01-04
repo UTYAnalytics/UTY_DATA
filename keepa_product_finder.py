@@ -21,7 +21,7 @@ import email
 import re
 import chromedriver_autoinstaller
 from selenium.common.exceptions import NoSuchElementException
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from pyvirtualdisplay import Display
 
@@ -297,10 +297,10 @@ for seller_id in retailer_ids_list:
         newest_file_path = get_newest_file(file_path)
         # Get the current UTC time
         current_utc_time = datetime.utcnow()
-        
+
         # Calculate the time difference for GMT+7
         gmt7_offset = timedelta(hours=7)
-        
+
         # Get the current date and time in GMT+7
         current_time_gmt7 = current_utc_time + gmt7_offset
         if newest_file_path:
@@ -593,7 +593,9 @@ for seller_id in retailer_ids_list:
                     row_dict["pk_column_name"] = md5_hash
                     # Insert the row into the database
                     response = (
-                        supabase.table("productfinder_keepa_raw").insert(row_dict).execute()
+                        supabase.table("productfinder_keepa_raw")
+                        .insert(row_dict)
+                        .execute()
                     )
                     if hasattr(response, "error") and response.error is not None:
                         raise Exception(f"Error inserting row: {response.error}")
@@ -601,30 +603,6 @@ for seller_id in retailer_ids_list:
             except Exception as e:
                 print(f"Error with row at index {index}: {e}")
                 # Optionally, break or continue based on your preference
-            # Execute the SQL query to retrieve distinct seller_id from the "best_seller_keepa" table
-            query = """
-                SELECT distinct seller_id
-                FROM best_seller_keepa
-                WHERE seller_id NOT IN (
-                    SELECT 
-                        CASE 
-                            WHEN POSITION('(' IN buy_box_seller) > 0 AND POSITION(')' IN buy_box_seller) > 0 
-                            THEN SUBSTRING(buy_box_seller FROM POSITION('(' IN buy_box_seller) + 1 FOR POSITION(')' IN buy_box_seller) - POSITION('(' IN buy_box_seller) - 1)
-                            ELSE NULL
-                        END AS extracted_string
-                    FROM productfinder_keepa_raw
-                    WHERE buy_box_seller LIKE '%(%' AND buy_box_seller LIKE '%)%'
-                )
-            """
-            
-            cursor.execute(query)
-            
-            
-            # Fetch all the rows as a list
-            result = cursor.fetchall()
-            
-            # Extract retailer_ids from the result
-            retailer_ids_list = [row[0] for row in result]
     except Exception as e:
         driver.quit()
         continue
