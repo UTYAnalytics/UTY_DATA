@@ -30,8 +30,8 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Replace these with your Keepa username and password
-username = "utycorp@"
-password = "H@h@!1234"
+username = "utytra1"
+password = "SgN2N.yvY@iR2kg"
 
 keepa_api_key_product = productrequest.KeepaAPI(
     "4ghd75c7ivb6tuoifdl793k6kvurslo049b40gkvtqbdkgttq3t34btb7och58rb"
