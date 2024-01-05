@@ -33,7 +33,7 @@ def check_update_needed():
 
     if last_run_date:
         # Convert the retrieved date string to a datetime object in UTC
-        last_run_datetime_utc = datetime.strptime(last_run_date[0], "%Y-%m-%d").replace(tzinfo=pytz.utc)
+        last_run_datetime_utc = last_run_date[0].replace(tzinfo=pytz.utc)
 
         # Convert to the desired timezone (GMT+7)
         last_run_datetime_gmt7 = last_run_datetime_utc.astimezone(desired_timezone)
