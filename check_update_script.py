@@ -33,16 +33,18 @@ def check_update_needed():
 
     if last_run_date:
         # Convert the retrieved date string to a datetime object in UTC
-        last_run_datetime_utc = last_run_date[0].replace(tzinfo=pytz.utc)
+        # Assuming last_run_date[0] is a datetime.date object
+        last_run_datetime_utc = datetime.combine(last_run_date[0], datetime.min.time()).replace(tzinfo=pytz.utc)
 
         # Convert to the desired timezone (GMT+7)
+        desired_timezone = pytz.timezone('Asia/Bangkok')
         last_run_datetime_gmt7 = last_run_datetime_utc.astimezone(desired_timezone)
 
         # Get today's date in the desired timezone
         today_gmt7 = datetime.now(desired_timezone).date()
 
-        # Check if an update is needed (you can customize this logic based on your requirements)
-        update_needed = today_gmt7 > last_run_datetime_gmt7
+        # Check if an update is needed
+        update_needed = today_gmt7 > last_run_datetime_gmt7.date()
         return update_needed
     else:
         # If no date is found, consider an update is needed
