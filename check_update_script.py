@@ -15,7 +15,6 @@ def check_update_needed():
     # Connect to the PostgreSQL database
     conn = psycopg2.connect(
         host=db_host,
-        port=db_port,
         database=db_name,
         user=db_user,
         password=db_password
