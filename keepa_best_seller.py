@@ -19,7 +19,7 @@ import email
 import re
 import chromedriver_autoinstaller
 from selenium.common.exceptions import NoSuchElementException
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import productrequest
 from pyvirtualdisplay import Display
 from concurrent.futures import ThreadPoolExecutor
@@ -107,9 +107,11 @@ def get_otp_from_email(server, email_address, email_password, subject_filter):
 
     return None
 
-data_result=[]
-def best_seller_Data():
 
+data_result = []
+
+
+def best_seller_Data():
     # Login process
     try:
         # Initialize the Chrome driver with the options
@@ -125,7 +127,9 @@ def best_seller_Data():
         )
         login_button.click()
 
-        username_field = wait.until(EC.visibility_of_element_located((By.ID, "username")))
+        username_field = wait.until(
+            EC.visibility_of_element_located((By.ID, "username"))
+        )
         username_field.send_keys(username)
 
         password_field = driver.find_element(By.ID, "password")
@@ -133,7 +137,9 @@ def best_seller_Data():
         password_field.send_keys(Keys.RETURN)
         time.sleep(10)
         try:
-            otp = get_otp_from_email(server, email_address, email_password, subject_filter)
+            otp = get_otp_from_email(
+                server, email_address, email_password, subject_filter
+            )
             otp_field = driver.find_element(By.ID, "otp")
             otp_field.send_keys(otp)
             otp_field.send_keys(Keys.RETURN)
@@ -195,14 +201,12 @@ def best_seller_Data():
     # Close the browser
     driver.quit()
 
-
     def get_newest_file(directory):
         files = glob.glob(os.path.join(directory, "*"))
         if not files:  # Check if the files list is empty
             return None
         newest_file = max(files, key=os.path.getmtime)
         return newest_file
-
 
     file_path = download_dir
 
@@ -214,13 +218,11 @@ def best_seller_Data():
     else:
         print("No files found in the specified directory.")
 
-
     # Database connection parameters
     db_host = "db.sxoqzllwkjfluhskqlfl.supabase.co"
     db_name = "postgres"
     db_user = "postgres"
     db_password = "5giE*5Y5Uexi3P2"
-
 
     # Add the new columns to the table
     # data = productrequest.add_columns_to_table(data, keepa_api_key_product)
@@ -278,17 +280,14 @@ def best_seller_Data():
     # cursor.close()
     # conn.close()
     delete_response = (
-        supabase.table("best_seller_keepa")
-        .delete()
-        .neq("seller_id", None)
-        .execute()
+        supabase.table("best_seller_keepa").delete().neq("seller_id", None).execute()
     )
 
     # Check for an error in the delete response
     if hasattr(delete_response, "error") and delete_response.error is not None:
         print(f"Error deleting existing data: {delete_response.error}")
         return
-    
+
     headers = [
         "name",
         "review_count_lifetime_percentage",
@@ -320,8 +319,9 @@ def best_seller_Data():
     data_result.append(data)
     return data_result
 
+
 with ThreadPoolExecutor() as executor:
-        # Submit each row for processing
-        futures = [executor.submit(best_seller_Data(), data_result)]
-        # Wait for all futures to complete
-        concurrent.futures.wait(futures)
+    # Submit each row for processing
+    futures = [executor.submit(best_seller_Data(), data_result)]
+    # Wait for all futures to complete
+    concurrent.futures.wait(futures)
