@@ -227,7 +227,15 @@ def best_seller_Data():
 
     # Drop the first column
     data.drop(data.columns[0], axis=1, inplace=True)
-    data["sys_run_date"] = str(date.today())
+    # Get the current UTC time
+    current_utc_time = datetime.utcnow()
+
+    # Calculate the time difference for GMT+7
+    gmt7_offset = timedelta(hours=7)
+
+    # Get the current date and time in GMT+7
+    current_time_gmt7 = current_utc_time + gmt7_offset
+    data["sys_run_date"] = current_time_gmt7.strftime("%Y-%m-%d %H:%M:%S")
 
     # Connect to your database
     conn = psycopg2.connect(
