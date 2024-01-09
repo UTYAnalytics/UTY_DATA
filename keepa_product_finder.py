@@ -103,18 +103,13 @@ cursor = conn.cursor()
 
 # Execute the SQL query to retrieve distinct seller_id from the "best_seller_keepa" table
 query = """
-    SELECT distinct seller_id
-    FROM best_seller_keepa
-    WHERE seller_id NOT IN (
-        SELECT 
-            CASE 
-                WHEN POSITION('(' IN buy_box_seller) > 0 AND POSITION(')' IN buy_box_seller) > 0 
-                THEN SUBSTRING(buy_box_seller FROM POSITION('(' IN buy_box_seller) + 1 FOR POSITION(')' IN buy_box_seller) - POSITION('(' IN buy_box_seller) - 1)
-                ELSE NULL
-            END AS extracted_string
-        FROM productfinder_keepa_raw
-        WHERE buy_box_seller LIKE '%(%' AND buy_box_seller LIKE '%)%'
-    );
+    with tmp as(
+select  a.*, number_of_asins/lifetime_ratings_count as asin_per_rating from seller_data_smartcount a
+where number_of_asins>=lifetime_ratings_count
+and lifetime_ratings_count<>0
+)
+select distinct seller_id from tmp
+where asin_per_rating>2;
 """
 
 cursor.execute(query)
@@ -224,10 +219,10 @@ for seller_id in retailer_ids_list:
         )
         buyboxcurrentfrom_field.send_keys("25")
 
-        newoffercountcurrent_field = wait.until(
-            EC.visibility_of_element_located((By.ID, "numberFrom-COUNT_NEW_current"))
-        )
-        newoffercountcurrent_field.send_keys("3")
+        # newoffercountcurrent_field = wait.until(
+        #     EC.visibility_of_element_located((By.ID, "numberFrom-COUNT_NEW_current"))
+        # )
+        # newoffercountcurrent_field.send_keys("3")
 
         sellerIDbuybox_field = wait.until(
             EC.visibility_of_element_located(
